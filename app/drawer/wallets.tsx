@@ -1,7 +1,6 @@
 import WalletsScreen from '@/screens/Initials/Wallets.Screen';
-import * as React from 'react';
 
-export default function InitialScreen() {
+export default function Wallets() {
 
   return <WalletsScreen />;
 }
