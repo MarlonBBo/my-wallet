@@ -1,70 +1,132 @@
-import {
-  NativeSelectScrollView,
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import type { TriggerRef } from '@rn-primitives/select';
-import * as React from 'react';
-import { Platform, View } from 'react-native';
-import { FlatList, ScrollView } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Header from '@/components/Header';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Text } from '@/components/ui/text';
+import { THEME } from '@/lib/theme';
+import { useFocusEffect } from 'expo-router';
+import { useColorScheme } from 'nativewind';
+import { useCallback, useState } from 'react';
+import { StatusBar, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { CategoryComponent } from './categoryComponent';
  
-const fruits = [
-  { label: 'Apple', value: 'apple' },
-  { label: 'Banana', value: 'banana' },
-  { label: 'Blueberry', value: 'blueberry' },
-  { label: 'Grapes', value: 'grapes' },
-  { label: 'Pineapple', value: 'pineapple' },
-  { label: 'Cherry', value: 'cherry' },
-  { label: 'Strawberry', value: 'strawberry' },
-  { label: 'Orange', value: 'orange' },
-  { label: 'Lemon', value: 'lemon' },
-  { label: 'Kiwi', value: 'kiwi' },
-  { label: 'Mango', value: 'mango' },
-  { label: 'Pomegranate', value: 'pomegranate' },
-  { label: 'Watermelon', value: 'watermelon' },
-  { label: 'Peach', value: 'peach' },
-  { label: 'Pear', value: 'pear' },
-  { label: 'Plum', value: 'plum' },
-  { label: 'Raspberry', value: 'raspberry' },
-  { label: 'Tangerine', value: 'tangerine' },
-];
+
+export function CategoryScreen() {
  
-export default function CategoryScreen() {
- 
-  const insets = useSafeAreaInsets();
-  const contentInsets = {
-    top: insets.top,
-    bottom: Platform.select({ ios: insets.bottom, android: insets.bottom + 24 }),
-    left: 12,
-    right: 12,
-  };
+  const [value, setValue] = useState('account');
+  const { colorScheme } = useColorScheme();
+  const theme = THEME[colorScheme ?? "light"];
+
+  useFocusEffect(
+      useCallback(() => {
+        StatusBar.setBarStyle(colorScheme === "dark" ? "light-content" : "dark-content");
+      }, [colorScheme])
+    );
  
   return (
-    <View className='flex-1 bg-background items-center justify-center'>
-      <Select>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Select a fruit" />
-        </SelectTrigger>
-          <SelectContent insets={contentInsets} className="w-[180px] max-h-[250px]">
-            <FlatList
-              data={fruits}
-              keyExtractor={(item) => item.value}
-              renderItem={({ item }) => (
-                <SelectItem label={item.label} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              )}
-              showsVerticalScrollIndicator={false}
-              style={{ maxHeight: 250 }}
+    <View className='flex-1 bg-background'>
+      <SafeAreaView>
+        <Header 
+          bg={theme.background} 
+          iconColor={theme.foreground}
+          iconOne='plus'
+          iconTwo='eye'
+        />
+      </SafeAreaView>
+      
+      <View className=' px-2'>
+        <Tabs value={value} onValueChange={setValue} className="w-[400px]">
+        <Text className='absolute font-bold text-2xl '>Categorias</Text>
+        <TabsList>
+          <TabsTrigger value="account">
+            <Text>Entrada</Text>
+          </TabsTrigger>
+          <TabsTrigger value="password">
+            <Text>Saída</Text>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="account">
+          <Card className='mr-8 p-3'>
+            <CategoryComponent
+              icon='box'
+              title='Estoque'
+              value='20.000,00'
+              date='10/10/2025 12:30'
+              onPress={() => console.log('say hello')}
             />
-          </SelectContent>
-      </Select>
+            <CategoryComponent
+              icon='box'
+              title='Estoque'
+              value='20.000,00'
+              date='10/10/2025 12:30'
+              onPress={() => console.log('say hello')}
+            />
+            <CategoryComponent
+              icon='box'
+              title='Estoque'
+              value='20.000,00'
+              date='10/10/2025 12:30'
+              onPress={() => console.log('say hello')}
+            />
+            <CategoryComponent
+              icon='box'
+              title='Estoque'
+              value='20.000,00'
+              date='10/10/2025 12:30'
+              onPress={() => console.log('say hello')}
+            />
+            <CategoryComponent
+              icon='box'
+              title='Estoque'
+              value='20.000,00'
+              date='10/10/2025 12:30'
+              onPress={() => console.log('say hello')}
+            />
+          </Card>
+        </TabsContent>
+        <TabsContent value="password">
+          <Card className='mr-8 p-3'>
+            <CategoryComponent
+              icon='bold'
+              title='Estoque'
+              value='20.000,00'
+              date='10/10/2025 12:30'
+              onPress={() => console.log('say hello')}
+            />
+            <CategoryComponent
+              icon='box'
+              title='Estoque'
+              value='20.000,00'
+              date='10/10/2025 12:30'
+              onPress={() => console.log('say hello')}
+            />
+            <CategoryComponent
+              icon='box'
+              title='Estoque'
+              value='20.000,00'
+              date='10/10/2025 12:30'
+              onPress={() => console.log('say hello')}
+            />
+            <CategoryComponent
+              icon='box'
+              title='Estoque'
+              value='20.000,00'
+              date='10/10/2025 12:30'
+              onPress={() => console.log('say hello')}
+            />
+            <CategoryComponent
+              icon='box'
+              title='Estoque'
+              value='20.000,00'
+              date='10/10/2025 12:30'
+              onPress={() => console.log('say hello')}
+            />
+          </Card>
+        </TabsContent>
+      </Tabs>
+      </View>
+
     </View>
   );
 }

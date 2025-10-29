@@ -40,7 +40,7 @@ export default function ExpenseScreen(){
 
             <View className="w-full gap-6 items-center mt-4 px-8">
                 <TextInput
-                    className="w-full border-b border-border italic color-foreground"
+                    className="w-full border-b border-border italic text-base color-foreground"
                     placeholder="Título da transação"
                     textAlign="center"
                     placeholderTextColor={theme.ring}

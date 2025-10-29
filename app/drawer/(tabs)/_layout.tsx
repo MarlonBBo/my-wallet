@@ -73,13 +73,13 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen
-        name="category"
+       <Tabs.Screen
+        name="transaction"
         options={{
-          title: "Categorias",
+          title: "Transações",
           tabBarIcon: ({ color }) => (
             <View style={{ alignItems: "center" }}>
-              <Feather size={22} name="clipboard" color={color} />
+              <Feather size={22} name="repeat" color={color} />
             </View>
           ),
         }}
@@ -96,13 +96,14 @@ export default function TabLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
-        name="transaction"
+        name="category"
         options={{
-          title: "Transações",
+          title: "Categorias",
           tabBarIcon: ({ color }) => (
             <View style={{ alignItems: "center" }}>
-              <Feather size={22} name="repeat" color={color} />
+              <Feather size={22} name="clipboard" color={color} />
             </View>
           ),
         }}

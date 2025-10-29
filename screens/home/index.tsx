@@ -6,16 +6,26 @@ import { MiniGraphComponent } from "@/components/Graphs/miniGraph";
 import { Text } from "@/components/ui/text";
 import Header from "@/components/Header";
 import { IndicatorsComponent } from "@/components/Indicators";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { CustomModal } from "@/components/ModalTransaction";
+import { Feather } from "@expo/vector-icons";
+import { THEME } from "@/lib/theme";
+import { useFocusEffect } from "expo-router";
 
 
 export default function HomeScreen() {
 
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const [visible, setVisible] = useState(false);
-
+ 
   const { colorScheme } = useColorScheme();
+  const theme = THEME[colorScheme ?? 'light']
+
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBarStyle(colorScheme === "dark" ? "dark-content" : "light-content");
+    }, [colorScheme])
+  );
 
   return (
     <ScrollView 
@@ -25,8 +35,6 @@ export default function HomeScreen() {
       showsVerticalScrollIndicator={false}
     >
 
-      <StatusBar barStyle={colorScheme === "dark" ? "dark-content" : "light-content"} />
-
       <View 
         onTouchStart={() => setScrollEnabled(true)}
         className="bg-foreground w-full h-80 items-center" 
@@ -34,7 +42,12 @@ export default function HomeScreen() {
         >
         <SafeAreaView className="gap-5 items-center w-full px-5">
 
-            <Header iconOne="bell" iconTwo="eye"/>
+            <Header 
+              bg={theme.foreground} 
+              iconColor={theme.background}
+              iconOne="bell" 
+              iconTwo="eye"
+            />
 
           <View className="gap-5">
             <Text 
@@ -49,9 +62,10 @@ export default function HomeScreen() {
 
           <TouchableOpacity 
             activeOpacity={0.7} 
-            className="bg-background py-2 px-4 rounded-md"
+            className="bg-background py-2 px-4 rounded-md flex-row justify-center items-center"
             onPress={() => setVisible(true)}
           >
+            <Feather name="dollar-sign" size={18} color={theme.foreground} />
             <Text className="color-foreground text-base font-medium text-center">Transação</Text>
           </TouchableOpacity>
         </SafeAreaView>

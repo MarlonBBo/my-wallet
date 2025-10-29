@@ -9,9 +9,17 @@ type IconsType = {
     iconOne?: ComponentProps<typeof Feather>['name'];
     iconTwo?: ComponentProps<typeof Feather>['name'];
     iconTree?: ComponentProps<typeof Feather>['name'];
+    bg: string;
+    iconColor: string;
 }
 
-export default function Header({iconOne, iconTwo, iconTree}: IconsType){
+export default function Header({
+    iconOne, 
+    iconTwo, 
+    iconTree, 
+    bg, 
+    iconColor
+}: IconsType){
 
     const { colorScheme } = useColorScheme();
     const theme = THEME[colorScheme ?? "light"];
@@ -23,15 +31,15 @@ export default function Header({iconOne, iconTwo, iconTree}: IconsType){
     };
 
     return(
-        <View className="w-screen bg-foreground pt-3 px-3 flex-row justify-between">
+        <View className="w-screen pt-3 px-3 flex-row justify-between" style={{backgroundColor: bg}}>
             <TouchableOpacity onPress={handleOpenDrawer}>
-                <Feather name="menu" size={22} color={theme.background} />
+                <Feather name="menu" size={22} color={iconColor} />
             </TouchableOpacity>
 
             <View className="flex-row gap-3">
-                {iconOne && <Feather name={iconOne} size={20} color={theme.background} />}
-                {iconTwo && <Feather name={iconTwo} size={20} color={theme.background} />}
-                {iconTree && <Feather name={iconTree} size={20} color={theme.background} />}
+                {iconOne && <Feather name={iconOne} size={20} color={iconColor} />}
+                {iconTwo && <Feather name={iconTwo} size={20} color={iconColor} />}
+                {iconTree && <Feather name={iconTree} size={20} color={iconColor} />}
             </View>
         </View>
     )
