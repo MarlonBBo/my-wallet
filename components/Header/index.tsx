@@ -1,14 +1,14 @@
 import { THEME } from "@/lib/theme";
 import { Feather } from "@expo/vector-icons";
 import { DrawerActions } from "@react-navigation/native";
-import { useNavigation } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { TouchableOpacity, View } from "react-native";
-import type { ComponentProps } from "react";
+import type { ReactNode } from "react";
 type IconsType = {
-    iconOne?: ComponentProps<typeof Feather>['name'];
-    iconTwo?: ComponentProps<typeof Feather>['name'];
-    iconTree?: ComponentProps<typeof Feather>['name'];
+    iconOne?: ReactNode;
+    iconTwo?: ReactNode;
+    iconTree?: ReactNode;
     bg: string;
     iconColor: string;
 }
@@ -37,9 +37,9 @@ export default function Header({
             </TouchableOpacity>
 
             <View className="flex-row gap-3">
-                {iconOne && <Feather name={iconOne} size={20} color={iconColor} />}
-                {iconTwo && <Feather name={iconTwo} size={20} color={iconColor} />}
-                {iconTree && <Feather name={iconTree} size={20} color={iconColor} />}
+                {iconOne}
+                {iconTwo}
+                {iconTree}
             </View>
         </View>
     )

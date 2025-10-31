@@ -14,21 +14,23 @@ export default function TabLayout() {
   const theme = THEME[colorScheme ?? "light"]; 
 
   useEffect(() => {
-    const backAction = () => {
-      if (pathname !== "/drawer/(tabs)/home") {
-        router.replace("/drawer/(tabs)/home");
-        return true; 
-      }
-      return false;
-    };
+  const backAction = () => {
+    const insideTabs = pathname.startsWith("/drawer/(tabs)");
 
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
+    if (!insideTabs) return false; 
 
-    return () => backHandler.remove();
-  }, [pathname]);
+    if (pathname !== "/drawer/(tabs)/home") {
+      router.replace("/drawer/(tabs)/home");
+      return true;
+    }
+
+    return false; 
+  };
+
+  const handler = BackHandler.addEventListener("hardwareBackPress", backAction);
+  return () => handler.remove();
+}, [pathname]);
+
 
   return (
     <Tabs

@@ -1,10 +1,11 @@
 import { Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
+import { formatarValorBr } from "@/utils/FormatCurrent";
 
 type WalletComponentProps = {
   title: string;
-  amount: string;
+  amount: number;
 };
 
 export default function WalletComponent({ title, amount }: WalletComponentProps) {
@@ -12,7 +13,7 @@ export default function WalletComponent({ title, amount }: WalletComponentProps)
   const isDark = colorScheme === "dark";
 
   return (
-    <View className="bg-card w-full px-2 py-4 border border-border rounded-2xl flex-row items-center justify-between gap-4">
+    <View className="bg-card w-full px-2 py-4 border border-border rounded-2xl flex-row items-center justify-between gap-4 mb-4">
       <View className="flex-row items-center gap-3 flex-1">
         <View className=" p-2 rounded-full">
           <Feather name="credit-card" size={20} color={isDark ? "#fff" : "#000"} />
@@ -27,7 +28,7 @@ export default function WalletComponent({ title, amount }: WalletComponentProps)
       </View>
 
       <Text className="color-foreground text-lg font-bold text-right shrink">
-        {amount}
+        {formatarValorBr(amount)}
       </Text>
     </View>
   );

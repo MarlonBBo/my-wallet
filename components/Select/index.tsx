@@ -44,11 +44,11 @@ export function SelectComponent(){
     };
 
     return(
-        <Select>
-        <SelectTrigger className="w-[180px]">
+        <Select className="w-5/6 ">
+        <SelectTrigger className="w-full">
             <SelectValue placeholder="Selecione a categoria" />
         </SelectTrigger>
-        <SelectContent insets={contentInsets} className="w-[180px] max-h-[250px]">
+        <SelectContent insets={contentInsets} className="w-[280px] max-h-[250px]">
             <FlatList
             data={fruits}
             keyExtractor={(item) => item.value}

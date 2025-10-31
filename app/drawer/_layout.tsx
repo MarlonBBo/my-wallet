@@ -1,12 +1,21 @@
 import { THEME } from "@/lib/theme";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "expo-router";
 import { Drawer } from "expo-router/drawer";
 import { useColorScheme } from "nativewind";
+import { useCallback } from "react";
+import { StatusBar } from "react-native";
 
 export default function DrawerLayout() {
 
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"]; 
+
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBarStyle(colorScheme === "dark" ? "dark-content" : "light-content");
+    }, [colorScheme])
+  );
 
   return (
     <Drawer

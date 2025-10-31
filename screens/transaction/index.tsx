@@ -40,8 +40,16 @@ export function TransactionScreen() {
         <Header 
           bg={theme.background} 
           iconColor={theme.foreground}
-          iconOne='plus'
-          iconTwo='eye'
+          iconOne={
+            <TouchableOpacity>
+              <Feather name='plus' size={20} color={theme.foreground}/>
+            </TouchableOpacity>
+          }
+          iconTwo={
+            <TouchableOpacity>
+              <Feather name='eye' size={20} color={theme.foreground}/>
+            </TouchableOpacity>
+          }
         />
       </SafeAreaView>
       
@@ -98,7 +106,7 @@ export function TransactionScreen() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                </View>
-            <Card className='p-3 mt-2'>
+            <Card className='p-3'>
             <TransactionComponent
                 icon='bar-chart-2'
                 title='Refrigerante'

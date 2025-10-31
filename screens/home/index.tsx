@@ -11,12 +11,16 @@ import { CustomModal } from "@/components/ModalTransaction";
 import { Feather } from "@expo/vector-icons";
 import { THEME } from "@/lib/theme";
 import { useFocusEffect } from "expo-router";
+import { useWalletStore } from "@/store/useWalletStore";
+import { formatarValorBr } from "@/utils/FormatCurrent";
 
 
 export default function HomeScreen() {
 
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const [visible, setVisible] = useState(false);
+
+  const { activeWallet } = useWalletStore();
  
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? 'light']
@@ -45,8 +49,16 @@ export default function HomeScreen() {
             <Header 
               bg={theme.foreground} 
               iconColor={theme.background}
-              iconOne="bell" 
-              iconTwo="eye"
+              iconOne={
+                <TouchableOpacity>
+                  <Feather name='bell' size={20} color={theme.background}/>
+                </TouchableOpacity>
+              } 
+              iconTwo={
+                <TouchableOpacity>
+                  <Feather name='eye' size={20} color={theme.background}/>
+                </TouchableOpacity>
+              }
             />
 
           <View className="gap-5">
@@ -55,9 +67,9 @@ export default function HomeScreen() {
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              Principal
+              {activeWallet.name}
             </Text>
-            <Text className="color-background text-2xl font-medium text-center">R$ 35.000,00</Text>
+            <Text className="color-background text-2xl font-medium text-center">{formatarValorBr(activeWallet.balance)}</Text>
           </View>
 
           <TouchableOpacity 

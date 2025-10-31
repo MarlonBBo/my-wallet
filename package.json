@@ -10,6 +10,7 @@
     "clean": "rm -rf .expo node_modules"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
     "@react-navigation/drawer": "^7.5.10",
     "@react-navigation/native": "^7.0.0",
     "@rn-primitives/dropdown-menu": "^1.2.0",
@@ -20,6 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "expo": "^54.0.0",
+    "expo-blur": "~15.0.7",
     "expo-constants": "~18.0.9",
     "expo-linear-gradient": "~15.0.7",
     "expo-linking": "~8.0.8",
