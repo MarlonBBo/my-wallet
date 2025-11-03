@@ -5,13 +5,19 @@ import { Text } from '@/components/ui/text';
 import { THEME } from '@/lib/theme';
 import { useFocusEffect } from 'expo-router';
 import { useColorScheme } from 'nativewind';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TransactionComponent } from './TransactionComponent';
 import { Feather } from '@expo/vector-icons';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { useTransactionsStore } from '@/store/useTransactionStore';
+import { useWalletStore } from '@/store/useWalletStore';
+import { useSQLiteContext } from 'expo-sqlite';
+import { FlatList } from 'react-native-gesture-handler';
+import { SkeletonCategoryRow } from './SkeletonComponent';
+import { EmptyTransaction } from './EmptyTransaction';
  
 
 export function TransactionScreen() {
@@ -20,11 +26,21 @@ export function TransactionScreen() {
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
 
+  const { loadTransactions, transactions, loading } = useTransactionsStore();
+  const { activeWallet } = useWalletStore();
+  const db = useSQLiteContext();
+
   useFocusEffect(
       useCallback(() => {
         StatusBar.setBarStyle(colorScheme === "dark" ? "light-content" : "dark-content");
       }, [colorScheme])
     );
+
+  useEffect(() => {
+      if (activeWallet.id) {
+          loadTransactions(activeWallet.id, db);
+      }
+  }, [db, activeWallet.id]);
 
     const insets = useSafeAreaInsets();
     const contentInsets = {
@@ -40,11 +56,6 @@ export function TransactionScreen() {
         <Header 
           bg={theme.background} 
           iconColor={theme.foreground}
-          iconOne={
-            <TouchableOpacity>
-              <Feather name='plus' size={20} color={theme.foreground}/>
-            </TouchableOpacity>
-          }
           iconTwo={
             <TouchableOpacity>
               <Feather name='eye' size={20} color={theme.foreground}/>
@@ -106,48 +117,24 @@ export function TransactionScreen() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                </View>
-            <Card className='p-3'>
-            <TransactionComponent
-                icon='bar-chart-2'
-                title='Refrigerante'
-                category='Estoque'
-                value='+20.000,00'
-                date='10/10/2025 12:30'
-                onPress={() => console.log('say hello')}
-            />
-            
-            <TransactionComponent
-                icon='bar-chart-2'
-                title='Refrigerante'
-                category='Estoque'
-                value='-20.000,00'
-                date='10/10/2025 12:30'
-                onPress={() => console.log('say hello')}
-            />
-            <TransactionComponent
-                icon='bar-chart-2'
-                title='Refrigerante'
-                category='Estoque'
-                value='-20.000,00'
-                date='10/10/2025 12:30'
-                onPress={() => console.log('say hello')}
-            />
-            <TransactionComponent
-                icon='bar-chart-2'
-                title='Refrigerante'
-                category='Estoque'
-                value='+20.000,00'
-                date='10/10/2025 12:30'
-                onPress={() => console.log('say hello')}
-            />
-            <TransactionComponent
-                icon='bar-chart-2'
-                title='Refrigerante'
-                category='Estoque'
-                value='+20.000,00'
-                date='10/10/2025 12:30'
-                onPress={() => console.log('say hello')}
-            />
+            <Card className='mx-1 p-3 h-[65vh]'>
+              <FlatList
+                data={transactions}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                  <TransactionComponent 
+                    category={item.categoryTitle}
+                    date={item.created_at}
+                    title={item.title}
+                    value={item.value}
+                    iconName={item.iconName}
+                    iconLib={item.iconLib}
+                    onPress={() => console.log()}
+                    type={item.type}
+                  />
+                )}
+                ListEmptyComponent={loading ? <SkeletonCategoryRow/> : <EmptyTransaction/> }
+              />
             </Card>
         </View>
     </View>

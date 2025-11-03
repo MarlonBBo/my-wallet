@@ -12,7 +12,8 @@ export function transactionDatabase(db: SQLiteDatabase) {
             transaction.value,
             transaction.created_at,
             transaction.title,
-            transaction.iconCategory
+            transaction.iconName,
+            transaction.iconLib
         ]);
 
         if (transaction.type === "income") {

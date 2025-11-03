@@ -19,14 +19,15 @@ export const QUERIES_CATEGORY = {
 export const QUERIES_TRANSACTION = {
 
     INSERT_TRANSACTION: `
-        INSERT INTO transactions (wallet_id, category_id, type, value, created_at, title, icon)
-        VALUES (?, ?, ?, ?, ?, ?, ?);
+        INSERT INTO transactions (wallet_id, category_id, type, value, created_at, title, icon_name, icon_lib)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
     `,
     SELECT_TRANSACTIONS: `
         SELECT 
         t.id, t.value, t.created_at, t.category_id, t.type, t.title,
         c.title as categoryTitle,
-        c.icon_name as iconCategory
+        c.icon_name as iconName,
+        c.icon_lib as iconLib
         FROM transactions t
         LEFT JOIN categories c
         ON c.id = t.category_id
@@ -37,7 +38,8 @@ export const QUERIES_TRANSACTION = {
         SELECT 
         t.id, t.value, t.created_at, t.category_id, t.type, t.title,
         c.title as categoryTitle,
-        c.icon as iconCategory
+        c.icon_name as iconName,
+        c.icon_lib as iconLib
         FROM transactions t
         LEFT JOIN categories c
         ON c.id = t.category_id

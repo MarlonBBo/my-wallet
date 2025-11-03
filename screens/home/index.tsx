@@ -6,16 +6,18 @@ import { MiniGraphComponent } from "@/components/Graphs/miniGraph";
 import { Text } from "@/components/ui/text";
 import Header from "@/components/Header";
 import { IndicatorsComponent } from "@/components/Indicators";
-import { useCallback, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import { CustomModal } from "@/components/ModalTransaction";
 import { Feather } from "@expo/vector-icons";
 import { THEME } from "@/lib/theme";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, router } from "expo-router";
 import { useWalletStore } from "@/store/useWalletStore";
 import { formatarValorBr } from "@/utils/FormatCurrent";
 
 
 export default function HomeScreen() {
+
+  const { modal } = useLocalSearchParams<{ modal?: string }>();
 
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const [visible, setVisible] = useState(false);
@@ -30,6 +32,16 @@ export default function HomeScreen() {
       StatusBar.setBarStyle(colorScheme === "dark" ? "dark-content" : "light-content");
     }, [colorScheme])
   );
+
+
+  useEffect(() => {
+  if (modal === "true") {
+    setVisible(true)
+    router.replace("/drawer/(tabs)/home") // limpa o param
+  }
+}, [modal])
+
+  
 
   return (
     <ScrollView 

@@ -1,66 +1,99 @@
-import { FlatList } from "react-native-gesture-handler";
-import {
-  NativeSelectScrollView,
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Platform, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { THEME } from "@/lib/theme";
+import { Categories } from "@/types/category";
+import { Feather } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useColorScheme } from "nativewind";
+import { useEffect, useMemo, useState } from "react";
+import { Keyboard, View } from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
 
-const fruits = [
-  { label: 'Apple', value: 'apple' },
-  { label: 'Banana', value: 'banana' },
-  { label: 'Blueberry', value: 'blueberry' },
-  { label: 'Grapes', value: 'grapes' },
-  { label: 'Pineapple', value: 'pineapple' },
-  { label: 'Cherry', value: 'cherry' },
-  { label: 'Strawberry', value: 'strawberry' },
-  { label: 'Orange', value: 'orange' },
-  { label: 'Lemon', value: 'lemon' },
-  { label: 'Kiwi', value: 'kiwi' },
-  { label: 'Mango', value: 'mango' },
-  { label: 'Pomegranate', value: 'pomegranate' },
-  { label: 'Watermelon', value: 'watermelon' },
-  { label: 'Peach', value: 'peach' },
-  { label: 'Pear', value: 'pear' },
-  { label: 'Plum', value: 'plum' },
-  { label: 'Raspberry', value: 'raspberry' },
-  { label: 'Tangerine', value: 'tangerine' },
-];
+type DropdownProps = {
+  categoriaSelecionada: number | string | null;
+  setCategoriaSelecionada: React.Dispatch<
+    React.SetStateAction<number | string | null>
+  >;
+  itens: Categories;
+};
 
-export function SelectComponent(){
+export function SelectComponent({
+  categoriaSelecionada,
+  setCategoriaSelecionada,
+  itens,
+}: DropdownProps) {
+  const [open, setOpen] = useState(false);
 
-    const insets = useSafeAreaInsets();
-    const contentInsets = {
-        top: insets.top,
-        bottom: Platform.select({ ios: insets.bottom, android: insets.bottom + 24 }),
-        left: 12,
-        right: 12
-    };
+  const { colorScheme } = useColorScheme();
+  const theme = THEME[colorScheme ?? "light"];
 
-    return(
-        <Select className="w-5/6 ">
-        <SelectTrigger className="w-full">
-            <SelectValue placeholder="Selecione a categoria" />
-        </SelectTrigger>
-        <SelectContent insets={contentInsets} className="w-[280px] max-h-[250px]">
-            <FlatList
-            data={fruits}
-            keyExtractor={(item) => item.value}
-            renderItem={({ item }) => (
-                <SelectItem label={item.label} value={item.value}>
-                {item.label}
-                </SelectItem>
-            )}
-            showsVerticalScrollIndicator={false}
-            style={{ maxHeight: 250 }}
-            />
-        </SelectContent>
-    </Select>
-    )
+  const dropdownItems = useMemo(() => {
+  return [
+    ...itens.map((item) => ({
+      label: item.title,
+      value: item.id,
+    })),
+    { label: "+ Criar nova categoria", value: "nova-categoria" },
+  ];
+}, [itens]);
+
+
+  return (
+    <View className="w-full gap-4">
+      <DropDownPicker
+        searchPlaceholder="Buscar categoria..."
+        open={open}
+        value={categoriaSelecionada}
+        items={dropdownItems}
+        onPress={() => Keyboard.dismiss()}
+        setOpen={setOpen}
+        setValue={(callback) => {
+          const value = callback(categoriaSelecionada);
+          if (value === "nova-categoria") {
+            setOpen(false);
+            setCategoriaSelecionada(null);
+            router.push("/create-category");
+          } else {
+            setCategoriaSelecionada(value);
+          }
+        }}
+        placeholder="Selecione uma categoria"
+        listMode="FLATLIST"
+        style={{
+          borderColor: theme.border,
+          backgroundColor: theme.card,
+          borderRadius: 12,
+          height: 50,
+          paddingHorizontal: 12,
+        }}
+        dropDownContainerStyle={{
+          borderColor: theme.border,
+          backgroundColor: theme.background,
+          borderRadius: 12,
+          maxHeight: 300,
+        }}
+        textStyle={{
+          fontSize: 15,
+          fontWeight: "500",
+          color: theme.foreground,
+        }}
+        placeholderStyle={{
+          color: theme.mutedForeground,
+          fontSize: 15,
+        }}
+        ArrowDownIconComponent={() => (
+          <Feather
+            name="chevron-down"
+            size={20}
+            color={theme.foreground}
+          />
+        )}
+        ArrowUpIconComponent={() => (
+          <Feather
+            name="chevron-up"
+            size={20}
+            color={theme.foreground}
+          />
+        )}
+      />
+    </View>
+  );
 }

@@ -17,16 +17,18 @@ import { FlatList } from 'react-native-gesture-handler';
 import { IconDto } from '@/types/iconType';
 import { EmptyCategory } from './EmptyCategory';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SkeletonCategoryRow, SkeletonCategoryRowTest } from './SkeletonComponent';
+import { SkeletonCategoryRow } from './SkeletonComponent';
+import { categoryDatabase } from '@/database/useCategoryDatabase';
  
 
 export function CategoryScreen() {
  
   const [value, setValue] = useState('account');
 
+  const db = useSQLiteContext();
+
   const { loadCategorys, categories, loading } = useCategoryStore();
   const { activeWallet } = useWalletStore();
-  const db = useSQLiteContext();
 
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
@@ -37,11 +39,11 @@ export function CategoryScreen() {
       }, [colorScheme])
     );
 
-  useFocusEffect(
-    useCallback(() => {
-        loadCategorys(activeWallet.id, db);
-    }, [categories.length, activeWallet, db])
-  );
+  useEffect(() => {
+        if(activeWallet.id){
+          loadCategorys(activeWallet.id, db);
+        }
+    }, [activeWallet.id, db]);
 
 
   const CategoriesIncome = categories.filter((c) => c.type === 'income')

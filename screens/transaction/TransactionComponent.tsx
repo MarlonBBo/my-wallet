@@ -2,22 +2,30 @@ import { THEME } from "@/lib/theme";
 import { Feather } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import { Text, View, TouchableOpacity } from "react-native";
+import { IconComponent } from "../category/iconComponent";
+import { IconLibName } from "@/types/iconType";
+import { formatToBR } from "@/utils/FormatDate";
+import { formatarValorBr } from "@/utils/FormatCurrent";
 
 type TransactionComponentProps = {
-  icon?: keyof typeof Feather.glyphMap;
+  iconName: string;
+  iconLib: IconLibName;
   title: string;
   date: string;
-  value: string;
-  category: string;
+  value: number;
+  category?: string;
+  type: 'income' | 'expense';
   onPress?: () => void;
 };
 
 export function TransactionComponent({
-  icon = "tag",
+  iconName,
+  iconLib,
   title,
   date,
   value,
   category,
+  type,
   onPress,
 }: TransactionComponentProps) {
   const { colorScheme } = useColorScheme();
@@ -27,7 +35,7 @@ export function TransactionComponent({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onPress}
-      className="border border-border rounded-2xl p-3 flex-row items-center bg-background shadow-sm"
+      className="border border-border rounded-2xl p-3 flex-row items-center bg-background shadow-sm mb-3"
       style={{
         shadowColor: theme.foreground,
         shadowOffset: { width: 0, height: 1 },
@@ -36,12 +44,11 @@ export function TransactionComponent({
         elevation: 1,
       }}
     >
-      {/* Ícone */}
+
       <View className="w-14 h-14 rounded-xl items-center justify-center border border-border bg-muted/30">
-        <Feather name={icon} size={28} color={theme.foreground} />
+        <IconComponent icon={iconName} lib={iconLib} />
       </View>
 
-      {/* Texto */}
       <View className="flex-1 ml-3">
         <Text className="font-semibold text-base text-foreground">
           {title}
@@ -49,13 +56,13 @@ export function TransactionComponent({
         <Text className="font-medium text-sm text-ring">
           {category}
         </Text>
-        <Text className="text-xs text-muted-foreground mt-0.5">{date}</Text>
+        <Text className="text-xs text-muted-foreground mt-0.5">{formatToBR(date)}</Text>
       </View>
 
-      {/* Valor */}
       <View>
         <Text className="font-extrabold text-lg text-foreground">
-          {value}
+          {type === "income" ? "+ " : "- "}
+          {formatarValorBr(value)}
         </Text>
       </View>
     </TouchableOpacity>

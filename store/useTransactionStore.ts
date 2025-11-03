@@ -29,7 +29,6 @@ export const useTransactionsStore = create<TransactionsStore>((set, get) => ({
         (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
       set({ transactions: dataSort, loading: false });
-      console.log("Transações carregadas: ", dataSort);
     } catch (error) {
       console.error("Erro ao carregar transações:", error);
       set({ loading: false });

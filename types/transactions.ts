@@ -1,3 +1,4 @@
+import { IconLibName } from "./iconType";
 
 export type TransactionType = {
   id: number;
@@ -6,7 +7,8 @@ export type TransactionType = {
   categoryTitle?: string;
   value: number;
   title: string;
-  iconCategory: string;
+  iconName: string;
+  iconLib: IconLibName;
   type: "income" | "expense";
   created_at: string;
 };

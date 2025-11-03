@@ -79,7 +79,7 @@ export function CustomModal({ visible, setVisible }: ModalProps) {
         >
           <View style={styles.cardsRow}>
             <TouchableOpacity
-              onPress={() => {router.push('/income'), setVisible(false)}}
+              onPress={() => {router.push('/expense'), setVisible(false)}}
               style={[
                 styles.card,
                 { backgroundColor: theme.background, borderColor: theme.foreground },

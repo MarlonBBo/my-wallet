@@ -63,12 +63,13 @@ export const useCategoryStore = create<CategoryStore>((set, get) => ({
   }
 },
 
-
   filterCategoryById: (id: number) => {
     const all = get().categories;
     const category = all.find((c) => c.id === id);
     return category;
   },
 
-  cleanCategories: () => set({ categories: [] })
+  cleanCategories: () => {
+    set({ categories: [], filteredCategories: [] });
+  }
 }));
