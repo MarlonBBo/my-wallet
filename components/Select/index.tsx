@@ -1,7 +1,10 @@
 import { THEME } from "@/lib/theme";
+import { useCategoryStore } from "@/store/useCategoryStore";
+import { useWalletStore } from "@/store/useWalletStore";
 import { Categories } from "@/types/category";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useSQLiteContext } from "expo-sqlite";
 import { useColorScheme } from "nativewind";
 import { useEffect, useMemo, useState } from "react";
 import { Keyboard, View } from "react-native";
@@ -12,28 +15,44 @@ type DropdownProps = {
   setCategoriaSelecionada: React.Dispatch<
     React.SetStateAction<number | string | null>
   >;
-  itens: Categories;
+  type: "income" | "expense";
 };
 
 export function SelectComponent({
   categoriaSelecionada,
   setCategoriaSelecionada,
-  itens,
+  type,
 }: DropdownProps) {
   const [open, setOpen] = useState(false);
+
+  const db = useSQLiteContext();
 
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
 
+  const { categories, loadCategorys, filterCategories, filteredCategories } = useCategoryStore();
+  const { activeWallet } = useWalletStore();
+
+  useEffect(() => {
+  if (activeWallet.id && categories.length === 0) {
+    loadCategorys(activeWallet.id, db).then(() => {
+      filterCategories(type);
+    });
+  } else {
+    filterCategories(type);
+  }
+}, [activeWallet.id, db, type, categories.length]);
+  
+
   const dropdownItems = useMemo(() => {
   return [
-    ...itens.map((item) => ({
+    ...filteredCategories.map((item) => ({
       label: item.title,
       value: item.id,
     })),
     { label: "+ Criar nova categoria", value: "nova-categoria" },
   ];
-}, [itens]);
+}, [filteredCategories]);
 
 
   return (

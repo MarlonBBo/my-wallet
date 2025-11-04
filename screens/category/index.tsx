@@ -97,7 +97,7 @@ export function CategoryScreen() {
                   lib={item.icon_lib}
                 />
               )}}
-            ListEmptyComponent={ loading ? <SkeletonCategoryRow/> : <EmptyCategory />}
+            ListEmptyComponent={<EmptyCategory />}
           />
             
           </Card>

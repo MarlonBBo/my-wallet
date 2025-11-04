@@ -10,35 +10,39 @@ import { useCallback, useEffect, useState } from "react";
 import { useWalletStore } from "@/store/useWalletStore";
 import { useSQLiteContext } from "expo-sqlite";
 import { WalletDto } from "@/types/wallet";
+import { Icon } from "@/components/ui/icon";
+import { Loader2 } from "lucide-react-native";
 
 export default function CreateWalletScreen() {
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
 
   const [walletName, setWalletName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const { addWallet } = useWalletStore();
   const db = useSQLiteContext();
 
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => {
-        router.replace("/drawer/wallets"); // volta para wallets sempre
-        return true;
-      };
-      const sub = BackHandler.addEventListener("hardwareBackPress", onBackPress);
-      return () => sub.remove();
-    }, [])
-  );
-
 
   async function handleSave() {
+
+    setIsLoading(true);
+
     if (!walletName.trim()) {
-      Alert.alert("Erro", "O nome da carteira é obrigatório.");
+      Alert.alert("Erro", "Por favor, insira um nome para a carteira.");
+      setIsLoading(false);
       return;
     }
-    await addWallet({ name: walletName }, db);
+
+    try{
+    addWallet({ name: walletName }, db);
     router.back();
+    }catch(err){
+      setIsLoading(false);
+      console.error("Erro ao criar carteira: ", err)
+    }finally{
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -70,16 +74,20 @@ export default function CreateWalletScreen() {
             className="mb-8"
           />
 
-          <Button
-            onPress={handleSave}
-            disabled={!walletName.trim()}
-            className="flex-row items-center justify-center w-full rounded-2xl"
-          >
-            <Feather name="plus" size={20} color={theme.background} />
-            <Text className="text-background font-semibold text-base">
-              Criar Carteira
-            </Text>
+          {isLoading ?
+          <Button disabled className="w-full">
+            <View className="pointer-events-none animate-spin">
+              <Icon as={Loader2} className="text-primary-foreground" />
+            </View>
+            <Text>Por favor, aguarde</Text>
           </Button>
+          :
+          (<Button onPress={() => handleSave()} className="w-full">
+            <Text className="text-background text-base font-semibold">
+              Adicionar Carteira
+            </Text>
+          </Button>)
+          }
         </View>
       </View>
     </SafeAreaView>

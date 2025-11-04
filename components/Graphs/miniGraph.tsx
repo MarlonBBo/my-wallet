@@ -1,5 +1,6 @@
 import { THEME } from "@/lib/theme";
 import { useColorScheme } from "nativewind";
+import { memo } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { LineChart } from "react-native-gifted-charts";
 
@@ -21,7 +22,7 @@ interface ViewProps {
   setScrollEnabled: (value: boolean) => void
 }
 
-export function MiniGraphComponent({setScrollEnabled}: ViewProps) {
+export const MiniGraphComponent = memo(function MiniGraphComponent({ setScrollEnabled, lastTransactionId }: ViewProps & { lastTransactionId: string | null }) {
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"]; 
 
@@ -200,7 +201,7 @@ export function MiniGraphComponent({setScrollEnabled}: ViewProps) {
       </View>
     </View>
   );
-}
+}, (prev, next) => prev.lastTransactionId === next.lastTransactionId);
 
 
 const styles = StyleSheet.create({

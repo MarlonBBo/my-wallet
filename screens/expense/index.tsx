@@ -31,19 +31,11 @@ export default function ExpenseScreen() {
   const [title, setTitle] = useState("");
 
   const { activeWallet } = useWalletStore();
-  const { categories, loadCategorys, filterCategoryById, filterCategories , filteredCategories } = useCategoryStore();
+  const { filterCategoryById } = useCategoryStore();
   const { addTransaction } = useTransactionsStore();
 
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
-
-  useEffect(() => {
-    if (activeWallet.id) {
-      loadCategorys(activeWallet.id, db).then(() => {
-        filterCategories("expense");
-      });
-    }
-  }, [activeWallet.id, db]);
 
   const handleAddTransaction = async () => {
     if (valorCentavos > 0 && categoriaSelecionada) {
@@ -77,7 +69,7 @@ export default function ExpenseScreen() {
         barStyle={colorScheme === "dark" ? "light-content" : "dark-content"}
       />
 
-      <SafeAreaView className="w-full mt-8">
+      <View className="mt-16">
         <View className="flex-row items-center justify-between">
           <View className="flex-1 items-center">
             <Text
@@ -107,7 +99,7 @@ export default function ExpenseScreen() {
             <Feather name="x" size={26} color={theme.foreground} />
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </View>
 
       <View className="mt-8 mb-4">
         <Text
@@ -146,7 +138,7 @@ export default function ExpenseScreen() {
         <SelectComponent 
           categoriaSelecionada={categoriaSelecionada}
           setCategoriaSelecionada={setCategoriaSelecionada}
-          itens={filteredCategories}
+          type="expense"
         />
 
       </View>

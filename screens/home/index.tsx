@@ -13,6 +13,7 @@ import { THEME } from "@/lib/theme";
 import { useFocusEffect, useLocalSearchParams, router } from "expo-router";
 import { useWalletStore } from "@/store/useWalletStore";
 import { formatarValorBr } from "@/utils/FormatCurrent";
+import { useTransactionsStore } from "@/store/useTransactionStore";
 
 
 export default function HomeScreen() {
@@ -23,6 +24,7 @@ export default function HomeScreen() {
   const [visible, setVisible] = useState(false);
 
   const { activeWallet } = useWalletStore();
+  const { transactions } = useTransactionsStore();
  
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? 'light']
@@ -33,11 +35,10 @@ export default function HomeScreen() {
     }, [colorScheme])
   );
 
-
   useEffect(() => {
   if (modal === "true") {
     setVisible(true)
-    router.replace("/drawer/(tabs)/home") // limpa o param
+    router.replace("/drawer/(tabs)/home")
   }
 }, [modal])
 
@@ -91,11 +92,14 @@ export default function HomeScreen() {
           >
             <Feather name="dollar-sign" size={18} color={theme.foreground} />
             <Text className="color-foreground text-base font-medium text-center">Transação</Text>
-          </TouchableOpacity>
+      </TouchableOpacity>
         </SafeAreaView>
       </View>
 
-      <MiniGraphComponent setScrollEnabled={setScrollEnabled}/>
+      <MiniGraphComponent 
+        setScrollEnabled={setScrollEnabled} 
+        lastTransactionId={transactions.length > 0 ? String(transactions[0].id) : null}
+      />
 
       <View onTouchStart={() => setScrollEnabled(true)}>
         <IndicatorsComponent />

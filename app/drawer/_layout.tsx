@@ -11,12 +11,6 @@ export default function DrawerLayout() {
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"]; 
 
-  useFocusEffect(
-    useCallback(() => {
-      StatusBar.setBarStyle(colorScheme === "dark" ? "dark-content" : "light-content");
-    }, [colorScheme])
-  );
-
   return (
     <Drawer
       initialRouteName="(tabs)"

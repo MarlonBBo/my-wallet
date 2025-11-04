@@ -133,7 +133,7 @@ export function TransactionScreen() {
                     type={item.type}
                   />
                 )}
-                ListEmptyComponent={loading ? <SkeletonCategoryRow/> : <EmptyTransaction/> }
+                ListEmptyComponent={<EmptyTransaction />}
               />
             </Card>
         </View>

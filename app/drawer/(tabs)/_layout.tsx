@@ -7,30 +7,8 @@ import { BackHandler, TouchableOpacity, View } from "react-native";
 
 export default function TabLayout() {
 
-  const router = useRouter();
-  const pathname = usePathname();
-
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"]; 
-
-  useEffect(() => {
-  const backAction = () => {
-    const insideTabs = pathname.startsWith("/drawer/(tabs)");
-
-    if (!insideTabs) return false; 
-
-    if (pathname !== "/drawer/(tabs)/home") {
-      router.replace("/drawer/(tabs)/home");
-      return true;
-    }
-
-    return false; 
-  };
-
-  const handler = BackHandler.addEventListener("hardwareBackPress", backAction);
-  return () => handler.remove();
-}, [pathname]);
-
 
   return (
     <Tabs

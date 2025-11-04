@@ -14,7 +14,7 @@ export default function RootLayout() {
   const { colorScheme, setColorScheme } = useColorScheme();
 
   useEffect(() => {
-    setColorScheme('light');
+    setColorScheme('dark');
   }, []);
 
   const navTheme = useMemo(

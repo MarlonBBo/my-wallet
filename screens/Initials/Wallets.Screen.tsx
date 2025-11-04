@@ -30,30 +30,27 @@ export default function WalletsScreen() {
     setActiveWallet(item);
     cleanCategories();
     router.push("/drawer/(tabs)/home");
+    StatusBar.setBarStyle(colorScheme === "dark" ? "dark-content" : "light-content");
   } 
 
-  useEffect(() => {
-    loadWallets(db);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBarStyle(colorScheme === "dark" ? "light-content" : "dark-content");
+    }, [colorScheme])
+  );
 
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => true; 
       const subscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
-
       return () => subscription.remove();
     }, [])
   );
 
-
   const totalSaldo = wallets.reduce((acc, w) => acc + w.balance, 0);
-
-  const isDark = colorScheme === "dark";
 
   return (
     <SafeAreaView className="flex-1 p-4 bg-background">
-      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
-
       <View className="rounded-3xl border border-border p-6 mb-8 flex-row justify-between items-center">
         <View className="flex-1">
           <Text className="color-foreground text-4xl font-bold mb-3">
@@ -61,7 +58,7 @@ export default function WalletsScreen() {
           </Text>
           <Text className="color-foreground text-lg font-medium">Saldo Total</Text>
           <Text className="color-foreground text-3xl font-bold mt-2">
-            {loading ? <Skeleton className="h-[35px] w-[110px] rounded-lg"/> : formatarValorBr(totalSaldo)}
+            {loading ? <Skeleton className="h-6 w-32" /> : formatarValorBr(totalSaldo)}
           </Text>
         </View>
       </View>
@@ -78,7 +75,7 @@ export default function WalletsScreen() {
               <WalletComponent amount={item.balance} title={item.name} />
             </TouchableOpacity>
           )}
-          ListEmptyComponent={loading ? <SkeletonCategoryRow/> : <EmptyWallets />}
+          ListEmptyComponent={loading ? <SkeletonCategoryRow /> : <EmptyWallets />}
         />
 
         <TouchableOpacity

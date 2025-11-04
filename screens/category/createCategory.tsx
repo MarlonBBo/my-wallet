@@ -68,7 +68,7 @@ export default function CreateCategory() {
     db
   );
 
-  router.push("/drawer/(tabs)/category");
+  router.back();
   setIsLoading(false)
 
   }catch(err){
