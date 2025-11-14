@@ -6,6 +6,7 @@ import { IconComponent } from "../category/iconComponent";
 import { IconLibName } from "@/types/iconType";
 import { formatToBR } from "@/utils/FormatDate";
 import { formatarValorBr } from "@/utils/FormatCurrent";
+import { useVisibilityStore } from "@/store/useVisibilityStore";
 
 type TransactionComponentProps = {
   iconName: string;
@@ -30,6 +31,7 @@ export function TransactionComponent({
 }: TransactionComponentProps) {
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
+  const { valuesVisible } = useVisibilityStore();
 
   return (
     <TouchableOpacity
@@ -61,8 +63,14 @@ export function TransactionComponent({
 
       <View>
         <Text className="font-extrabold text-lg text-foreground">
-          {type === "income" ? "+ " : "- "}
-          {formatarValorBr(value)}
+          {valuesVisible ? (
+            <>
+              {type === "income" ? "+ " : "- "}
+              {formatarValorBr(value)}
+            </>
+          ) : (
+            `${type === "income" ? "+ " : "- "}R$ ••••••`
+          )}
         </Text>
       </View>
     </TouchableOpacity>

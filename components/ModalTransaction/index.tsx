@@ -1,4 +1,6 @@
 import { THEME } from "@/lib/theme";
+import { useTransactionsStore } from "@/store/useTransactionStore";
+import { formatarValorBr } from "@/utils/FormatCurrent";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useColorScheme } from "nativewind";
@@ -19,6 +21,9 @@ type ModalProps = {
 
 export function CustomModal({ visible, setVisible }: ModalProps) {
   const router = useRouter();
+
+  const { filterByDate } = useTransactionsStore();
+
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
 
@@ -26,6 +31,10 @@ export function CustomModal({ visible, setVisible }: ModalProps) {
   const slideAnim = useRef(new Animated.Value(300)).current;
 
   const [show, setShow] = useState(visible);
+
+  const totalSaidasHoje = filterByDate(new Date().toString(), "expense");
+
+  const totalEntradasHoje = filterByDate(new Date().toString(), "income");
 
   useEffect(() => {
     if (visible) {
@@ -95,7 +104,7 @@ export function CustomModal({ visible, setVisible }: ModalProps) {
                 Despesas
               </Text>
               <Text style={[styles.cardValue, { color: theme.foreground }]}>
-                R$33.000,00
+                {formatarValorBr(totalSaidasHoje)}
               </Text>
               <Text style={[styles.cardSubtitle, { color: theme.foreground }]}>
                 Suas despesas do dia
@@ -119,7 +128,7 @@ export function CustomModal({ visible, setVisible }: ModalProps) {
                 Receitas
               </Text>
               <Text style={[styles.cardValue, { color: theme.foreground }]}>
-                R$33.000,00
+                {formatarValorBr(totalEntradasHoje)}
               </Text>
               <Text style={[styles.cardSubtitle, { color: theme.foreground }]}>
                 Suas receitas do dia

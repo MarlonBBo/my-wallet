@@ -18,6 +18,7 @@ export default function TabLayout() {
         tabBarShowLabel: false,
         tabBarActiveTintColor: theme.foreground,
         tabBarInactiveTintColor: theme.ring,
+        lazy: true,
         tabBarStyle: {
           position: "absolute",
           bottom: 60,

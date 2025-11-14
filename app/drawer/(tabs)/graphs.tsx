@@ -1,9 +1,5 @@
-import { View } from "react-native";
+import { GraphsScreen } from "@/screens/graphs";
 
-export default function Graphs(){
-    return (
-        <View>
-
-        </View>
-    )
+export default function Graphs() {
+  return <GraphsScreen />;
 }

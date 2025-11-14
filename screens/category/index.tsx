@@ -5,7 +5,7 @@ import { Text } from '@/components/ui/text';
 import { THEME } from '@/lib/theme';
 import { router, useFocusEffect } from 'expo-router';
 import { useColorScheme } from 'nativewind';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { StatusBar, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CategoryComponent } from './categoryComponent';
@@ -13,12 +13,14 @@ import { Feather } from '@expo/vector-icons'
 import { useCategoryStore } from '@/store/useCategoryStore';
 import { useWalletStore } from '@/store/useWalletStore';
 import { useSQLiteContext } from 'expo-sqlite';
+import { useVisibilityStore } from '@/store/useVisibilityStore';
 import { FlatList } from 'react-native-gesture-handler';
 import { IconDto } from '@/types/iconType';
 import { EmptyCategory } from './EmptyCategory';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SkeletonCategoryRow } from './SkeletonComponent';
 import { categoryDatabase } from '@/database/useCategoryDatabase';
+import { OnboardingModal } from '@/components/OnboardingModal';
  
 
 export function CategoryScreen() {
@@ -29,6 +31,7 @@ export function CategoryScreen() {
 
   const { loadCategorys, categories, loading } = useCategoryStore();
   const { activeWallet } = useWalletStore();
+  const { valuesVisible, toggleValuesVisibility } = useVisibilityStore();
 
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
@@ -43,11 +46,16 @@ export function CategoryScreen() {
         if(activeWallet.id){
           loadCategorys(activeWallet.id, db);
         }
-    }, [activeWallet.id, db]);
+    }, [activeWallet.id, db, loadCategorys]);
 
-
-  const CategoriesIncome = categories.filter((c) => c.type === 'income')
-  const CategoriesExpense = categories.filter((c) => c.type === 'expense')
+  const CategoriesIncome = useMemo(
+    () => categories.filter((c) => c.type === 'income'),
+    [categories]
+  );
+  const CategoriesExpense = useMemo(
+    () => categories.filter((c) => c.type === 'expense'),
+    [categories]
+  );
  
   return (
     <View className='flex-1 bg-background'>
@@ -61,8 +69,12 @@ export function CategoryScreen() {
             </TouchableOpacity>
           }
           iconTwo={
-            <TouchableOpacity>
-              <Feather name='eye' size={20} color={theme.foreground}/>
+            <TouchableOpacity onPress={toggleValuesVisibility}>
+              <Feather 
+                name={valuesVisible ? 'eye' : 'eye-off'} 
+                size={20} 
+                color={theme.foreground}
+              />
             </TouchableOpacity>
           }
         />
@@ -86,17 +98,20 @@ export function CategoryScreen() {
             data={CategoriesIncome}
             keyExtractor={(cat) => cat.id.toString()}
             showsVerticalScrollIndicator={false}
-            renderItem={({item}) => {
-         
-              return(
+            removeClippedSubviews
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            windowSize={5}
+            renderItem={({item}) => (
                 <CategoryComponent
                   date={item.created_at}
                   title={item.title}
                   value={item.total}
                   icon={item.icon_name}
                   lib={item.icon_lib}
+                  categoryId={item.id}
                 />
-              )}}
+            )}
             ListEmptyComponent={<EmptyCategory />}
           />
             
@@ -108,25 +123,41 @@ export function CategoryScreen() {
             data={CategoriesExpense}
             keyExtractor={(cat) => cat.id.toString()}
             showsVerticalScrollIndicator={false}
-            renderItem={({item}) => {
-
-              return(
+            removeClippedSubviews
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            windowSize={5}
+            renderItem={({item}) => (
                 <CategoryComponent
                   date={item.created_at}
                   title={item.title}
                   value={item.total}
                   icon={item.icon_name}
                   lib={item.icon_lib}
+                  categoryId={item.id}
                 />
-              )}}
-            ListEmptyComponent={ loading ? <SkeletonCategoryRow /> : <EmptyCategory />}
+            )}
+            ListEmptyComponent={loading ? <SkeletonCategoryRow /> : <EmptyCategory />}
           />
 
           </Card>
         </TabsContent>
-      </Tabs>
+        </Tabs>
       </View>
 
+      <OnboardingModal
+        screenKey="categories"
+        title="Categorias"
+        description="Organize suas transações por categorias para ter um melhor controle financeiro."
+        icon="clipboard"
+        features={[
+          "Crie categorias personalizadas para suas receitas e despesas",
+          "Visualize o total gasto ou recebido em cada categoria",
+          "Use o botão + para criar novas categorias",
+          "Separe suas categorias entre Entrada e Saída",
+          "Cada categoria mostra o valor total acumulado"
+        ]}
+      />
     </View>
   );
 }

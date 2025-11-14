@@ -6,6 +6,8 @@ import { IconComponent } from "./iconComponent";
 import { IconDto, IconLibName, IconType } from "@/types/iconType";
 import { formatarValorBr } from "@/utils/FormatCurrent";
 import { formatToBR } from "@/utils/FormatDate";
+import { useVisibilityStore } from "@/store/useVisibilityStore";
+import { router } from "expo-router";
 
 type CategoryComponentProps = {
   icon: string;
@@ -13,6 +15,7 @@ type CategoryComponentProps = {
   title: string;
   date: string;
   value: number;
+  categoryId?: number;
   onPress?: () => void;
 };
 
@@ -22,15 +25,28 @@ export function CategoryComponent({
   title,
   date,
   value,
+  categoryId,
   onPress,
 }: CategoryComponentProps) {
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
+  const { valuesVisible } = useVisibilityStore();
+
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+    } else if (categoryId) {
+      router.push({
+        pathname: "/detail-category",
+        params: { id: categoryId.toString() },
+      });
+    }
+  };
 
   return (
     <TouchableOpacity
       activeOpacity={0.7}
-      onPress={onPress}
+      onPress={handlePress}
       className="border border-border rounded-2xl p-3 flex-row items-center bg-background shadow-sm mb-3"
       style={{
         shadowColor: theme.foreground,
@@ -54,7 +70,7 @@ export function CategoryComponent({
 
       <View>
         <Text className="font-extrabold text-lg text-foreground">
-          {formatarValorBr(value)}
+          {valuesVisible ? formatarValorBr(value) : 'R$ ••••••'}
         </Text>
       </View>
     </TouchableOpacity>

@@ -1,9 +1,5 @@
-import { View } from "react-native";
+import AnotationScreen from "@/screens/anotation";
 
-export default function Anotations(){
-    return (
-        <View>
-
-        </View>
-    )
+export default function AnotationsRoute(){
+    return <AnotationScreen />
 }

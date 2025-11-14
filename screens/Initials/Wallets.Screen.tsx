@@ -36,7 +36,10 @@ export default function WalletsScreen() {
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBarStyle(colorScheme === "dark" ? "light-content" : "dark-content");
-    }, [colorScheme])
+      if (db) {
+        loadWallets(db);
+      }
+    }, [colorScheme, db, loadWallets])
   );
 
   useFocusEffect(
@@ -46,6 +49,12 @@ export default function WalletsScreen() {
       return () => subscription.remove();
     }, [])
   );
+
+  useEffect(() => {
+    if (db) {
+      loadWallets(db);
+    }
+  }, [db, loadWallets]);
 
   const totalSaldo = wallets.reduce((acc, w) => acc + w.balance, 0);
 

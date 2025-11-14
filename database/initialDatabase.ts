@@ -76,7 +76,7 @@ export async function initializeDatabase(database: SQLiteDatabase) {
     CREATE TABLE IF NOT EXISTS anotations_itens (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       anotation_id INTEGER NOT NULL,
-      category_id INTEGER NOT NULL,
+      category_id INTEGER NULL,
       title TEXT NOT NULL,
       value INTEGER NOT NULL,
       completed INTEGER DEFAULT 0,

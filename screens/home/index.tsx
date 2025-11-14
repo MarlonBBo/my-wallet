@@ -14,6 +14,8 @@ import { useFocusEffect, useLocalSearchParams, router } from "expo-router";
 import { useWalletStore } from "@/store/useWalletStore";
 import { formatarValorBr } from "@/utils/FormatCurrent";
 import { useTransactionsStore } from "@/store/useTransactionStore";
+import { useVisibilityStore } from "@/store/useVisibilityStore";
+import { OnboardingModal } from "@/components/OnboardingModal";
 
 
 export default function HomeScreen() {
@@ -25,6 +27,7 @@ export default function HomeScreen() {
 
   const { activeWallet } = useWalletStore();
   const { transactions } = useTransactionsStore();
+  const { valuesVisible, toggleValuesVisibility } = useVisibilityStore();
  
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? 'light']
@@ -57,7 +60,7 @@ export default function HomeScreen() {
         className="bg-foreground w-full h-80 items-center" 
         style={{borderBottomLeftRadius: 60, borderBottomRightRadius: 60}}
         >
-        <SafeAreaView className="gap-5 items-center w-full px-5">
+        <SafeAreaView className="gap-5 items-center w-full">
 
             <Header 
               bg={theme.foreground} 
@@ -68,8 +71,12 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               } 
               iconTwo={
-                <TouchableOpacity>
-                  <Feather name='eye' size={20} color={theme.background}/>
+                <TouchableOpacity onPress={toggleValuesVisibility}>
+                  <Feather 
+                    name={valuesVisible ? 'eye' : 'eye-off'} 
+                    size={20} 
+                    color={theme.background}
+                  />
                 </TouchableOpacity>
               }
             />
@@ -82,7 +89,9 @@ export default function HomeScreen() {
             >
               {activeWallet.name}
             </Text>
-            <Text className="color-background text-2xl font-medium text-center">{formatarValorBr(activeWallet.balance)}</Text>
+            <Text className="color-background text-2xl font-medium text-center">
+              {valuesVisible ? formatarValorBr(activeWallet.balance) : 'R$ ••••••'}
+            </Text>
           </View>
 
           <TouchableOpacity 
@@ -108,6 +117,20 @@ export default function HomeScreen() {
       <View className="h-36"/>
 
       <CustomModal visible={visible} setVisible={setVisible}/>
+      
+      <OnboardingModal
+        screenKey="home"
+        title="Tela Principal"
+        description="Bem-vindo! Esta é sua tela principal onde você pode ver o resumo das suas finanças."
+        icon="home"
+        features={[
+          "Visualize o saldo da sua carteira ativa",
+          "Acompanhe suas transações do dia",
+          "Veja gráficos das suas saídas semanais",
+          "Use o botão Transação para adicionar receitas ou despesas",
+          "Toque no ícone do olho para ocultar/mostrar valores"
+        ]}
+      />
     </ScrollView>
 
     

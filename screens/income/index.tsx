@@ -16,9 +16,13 @@ import { useWalletStore } from "@/store/useWalletStore";
 import { useTransactionsStore } from "@/store/useTransactionStore";
 import { useCategoryStore } from "@/store/useCategoryStore";
 import { useSQLiteContext } from "expo-sqlite";
+import { useVisibilityStore } from "@/store/useVisibilityStore";
 import { handleChange } from "@/utils/TransformInInteger";
 import { formatarValorBr } from "@/utils/FormatCurrent";
 import { TransactionDto } from "@/types/transactions";
+import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
+import { Loader2 } from "lucide-react-native";
 
 export default function IncomeScreen() {
 
@@ -27,15 +31,20 @@ export default function IncomeScreen() {
   const [valorCentavos, setValorCentavos] = useState(0);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<number | string | null>(null);
   const [title, setTitle] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const { activeWallet } = useWalletStore();
   const { filterCategoryById } = useCategoryStore();
   const { addTransaction } = useTransactionsStore();
+  const { valuesVisible } = useVisibilityStore();
 
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
 
   const handleAddTransaction = async () => {
+
+    setIsLoading(true);
+
     if (valorCentavos > 0 && categoriaSelecionada) {
 
       if (valorCentavos <= 0 || !categoriaSelecionada) return;
@@ -43,7 +52,9 @@ export default function IncomeScreen() {
       const CatSelected = filterCategoryById(Number(categoriaSelecionada));
       if(!CatSelected) return;
 
-      const transaction: TransactionDto = {
+      try {
+
+        const transaction: TransactionDto = {
         walletId: activeWallet.id,
         categoryId: Number(categoriaSelecionada),
         value: valorCentavos,
@@ -55,6 +66,13 @@ export default function IncomeScreen() {
       };
       await addTransaction(transaction, db);
       router.push("/drawer/(tabs)/home");
+      setIsLoading(false);
+
+      }catch (error) {
+        console.log("Erro ao adicionar transação: ", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -86,7 +104,7 @@ export default function IncomeScreen() {
                 borderColor: theme.border,
               }}
             >
-              R$ 35.000,00
+              {valuesVisible ? formatarValorBr(activeWallet.balance) : 'R$ ••••••'}
             </Text>
           </View>
 
@@ -140,19 +158,20 @@ export default function IncomeScreen() {
         />
       </View>
 
-      <TouchableOpacity
-        activeOpacity={0.8}
-        className="absolute bottom-20 w-full self-center py-3 rounded-md "
-        style={{ backgroundColor: theme.foreground }}
-        onPress={handleAddTransaction}
-      >
-        <Text
-          className="text-center font-semibold"
-          style={{ color: theme.background }}
-        >
-          Salvar Transação
-        </Text>
-      </TouchableOpacity>
+        {isLoading ?
+          <Button disabled className="absolute bottom-20 w-full self-center rounded-md">
+            <View className="pointer-events-none animate-spin">
+              <Icon as={Loader2} className="text-primary-foreground" />
+            </View>
+            <Text>Por favor, aguarde</Text>
+          </Button>
+          :
+          (<Button onPress={() => handleAddTransaction()} className="absolute bottom-20 w-full self-center rounded-md">
+            <Text className="text-background text-base font-semibold">
+              Salvar Categoria
+            </Text>
+          </Button>)
+        }
     </View>
   );
 }

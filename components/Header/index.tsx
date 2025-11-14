@@ -11,6 +11,7 @@ type IconsType = {
     iconTree?: ReactNode;
     bg: string;
     iconColor: string;
+    viewDrawer?: boolean;
 }
 
 export default function Header({
@@ -18,7 +19,8 @@ export default function Header({
     iconTwo, 
     iconTree, 
     bg, 
-    iconColor
+    iconColor,
+    viewDrawer = true
 }: IconsType){
 
     const { colorScheme } = useColorScheme();
@@ -31,12 +33,14 @@ export default function Header({
     };
 
     return(
-        <View className="w-screen pt-3 px-3 flex-row justify-between" style={{backgroundColor: bg}}>
-            <TouchableOpacity onPress={handleOpenDrawer}>
-                <Feather name="menu" size={22} color={iconColor} />
-            </TouchableOpacity>
+        <View className="w-full pt-3 px-3 flex-row justify-between" style={{backgroundColor: bg}}>
+            {viewDrawer && (
+                <TouchableOpacity onPress={handleOpenDrawer}>
+                    <Feather name="menu" size={22} color={iconColor} />
+                </TouchableOpacity>
+            )}
 
-            <View className="flex-row gap-3">
+            <View className={`flex-row gap-5 ${viewDrawer ? 'justify-end' : 'flex-1 justify-end'}`}>
                 {iconOne}
                 {iconTwo}
                 {iconTree}
