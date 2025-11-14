@@ -109,7 +109,6 @@ export function CategoryScreen() {
                   value={item.total}
                   icon={item.icon_name}
                   lib={item.icon_lib}
-                  categoryId={item.id}
                 />
             )}
             ListEmptyComponent={<EmptyCategory />}
@@ -134,7 +133,6 @@ export function CategoryScreen() {
                   value={item.total}
                   icon={item.icon_name}
                   lib={item.icon_lib}
-                  categoryId={item.id}
                 />
             )}
             ListEmptyComponent={loading ? <SkeletonCategoryRow /> : <EmptyCategory />}

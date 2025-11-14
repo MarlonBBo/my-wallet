@@ -7,7 +7,6 @@ import { useVisibilityStore } from "@/store/useVisibilityStore";
 import { useTransactionsStore } from "@/store/useTransactionStore";
 import { useWalletStore } from "@/store/useWalletStore";
 import { router } from "expo-router";
-import { Feather } from "@expo/vector-icons";
 
 
 type ChartItem = {
@@ -36,46 +35,71 @@ export const MiniGraphComponent = memo(function MiniGraphComponent({ setScrollEn
 
   // Calcular dados da semana (últimos 7 dias)
   const { data, weekRange, maxValue, hasData } = useMemo(() => {
-    if (!activeWallet || transactions.length === 0) {
-      return {
-        data: [],
-        weekRange: "",
-        maxValue: 1000,
-        hasData: false,
-      };
-    }
-
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const weekStart = new Date(today);
     weekStart.setDate(weekStart.getDate() - 6); // Últimos 7 dias (incluindo hoje)
 
+    // Função auxiliar para normalizar datas (apenas ano, mês, dia) e comparar
+    const normalizeDate = (date: Date) => {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    };
+
+    const getDateString = (date: Date): string => {
+      const normalized = normalizeDate(date);
+      return `${normalized.getFullYear()}-${String(normalized.getMonth() + 1).padStart(2, '0')}-${String(normalized.getDate()).padStart(2, '0')}`;
+    };
+
     // Filtrar transações de despesas (expense) da semana
-    const weekExpenses = transactions.filter((t) => {
-      if (t.type !== "expense" || t.walletId !== activeWallet.id) return false;
-      const transDate = new Date(t.created_at);
-      const transDateOnly = new Date(
-        transDate.getFullYear(),
-        transDate.getMonth(),
-        transDate.getDate()
-      );
-      return transDateOnly.getTime() >= weekStart.getTime();
-    });
+    const weekExpenses = activeWallet && transactions.length > 0
+      ? transactions.filter((t) => {
+          if (t.type !== "expense" || t.walletId !== activeWallet.id) return false;
+          
+          // Tentar múltiplas formas de parsear a data
+          let transDate: Date;
+          try {
+            transDate = new Date(t.created_at);
+            // Se a data for inválida, tentar parsear como string ISO
+            if (isNaN(transDate.getTime())) {
+              transDate = new Date(t.created_at.replace(' ', 'T'));
+            }
+          } catch {
+            return false;
+          }
+          
+          const transDateNormalized = normalizeDate(transDate);
+          const weekStartNormalized = normalizeDate(weekStart);
+          const todayNormalized = normalizeDate(today);
+          
+          const isInRange = transDateNormalized.getTime() >= weekStartNormalized.getTime() && 
+                           transDateNormalized.getTime() <= todayNormalized.getTime();
+          
+          return isInRange;
+        })
+      : [];
 
     // Criar array com os 7 dias
     const daysData: Array<{ value: number; label: string; date: Date }> = [];
+    
     for (let i = 0; i < 7; i++) {
       const day = new Date(weekStart);
       day.setDate(day.getDate() + i);
+      const dayStr = getDateString(day);
       
       const dayExpenses = weekExpenses.filter((t) => {
-        const transDate = new Date(t.created_at);
-        const transDateOnly = new Date(
-          transDate.getFullYear(),
-          transDate.getMonth(),
-          transDate.getDate()
-        );
-        return transDateOnly.getTime() === day.getTime();
+        // Tentar múltiplas formas de parsear a data
+        let transDate: Date;
+        try {
+          transDate = new Date(t.created_at);
+          if (isNaN(transDate.getTime())) {
+            transDate = new Date(t.created_at.replace(' ', 'T'));
+          }
+        } catch {
+          return false;
+        }
+        
+        const transDateStr = getDateString(transDate);
+        return transDateStr === dayStr;
       });
 
       const total = dayExpenses.reduce((sum, t) => sum + t.value, 0);
@@ -88,8 +112,8 @@ export const MiniGraphComponent = memo(function MiniGraphComponent({ setScrollEn
       });
     }
 
-    // Verificar se há dados suficientes (pelo menos um dia com valor > 0)
-    const hasEnoughData = daysData.some((d) => d.value > 0);
+    // Verificar se há dados (pelo menos um dia com valor > 0)
+    const hasAnyData = daysData.some((d) => d.value > 0);
 
     // Calcular maxValue (arredondar para cima para melhor visualização)
     const max = Math.max(...daysData.map((d) => d.value), 0);
@@ -107,7 +131,7 @@ export const MiniGraphComponent = memo(function MiniGraphComponent({ setScrollEn
       data: daysData,
       weekRange: weekRangeText,
       maxValue: roundedMax,
-      hasData: hasEnoughData,
+      hasData: hasAnyData,
     };
   }, [transactions, activeWallet]);
 
@@ -163,8 +187,7 @@ export const MiniGraphComponent = memo(function MiniGraphComponent({ setScrollEn
           </View>
 
           {/* Gráfico */}
-          {hasData ? (
-            <LineChart
+          <LineChart
               data={data}
               curved
               height={150}
@@ -266,44 +289,6 @@ export const MiniGraphComponent = memo(function MiniGraphComponent({ setScrollEn
                 ),
               }}
             />
-          ) : (
-            <View
-              style={{
-                height: 150,
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 20,
-              }}
-            >
-              <Feather
-                name="bar-chart-2"
-                size={40}
-                color={theme.mutedForeground}
-                style={{ marginBottom: 12, opacity: 0.5 }}
-              />
-              <Text
-                style={{
-                  color: theme.foreground,
-                  fontSize: 16,
-                  fontWeight: "600",
-                  textAlign: "center",
-                  marginBottom: 6,
-                }}
-              >
-                Gráfico de Saídas
-              </Text>
-              <Text
-                style={{
-                  color: theme.mutedForeground,
-                  fontSize: 13,
-                  textAlign: "center",
-                  lineHeight: 18,
-                }}
-              >
-                Registre despesas nesta semana para visualizar o gráfico completo
-              </Text>
-            </View>
-          )}
         </View>
         <TouchableOpacity 
         className="w-auto m-2 p-4 bg-foreground items-center justify-center rounded-3xl" 

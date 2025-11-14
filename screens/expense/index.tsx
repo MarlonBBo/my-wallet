@@ -67,7 +67,7 @@ export default function ExpenseScreen() {
         iconLib: CatSelected.icon_lib
       };
       await addTransaction(transaction, db);
-      router.push("/drawer/(tabs)/home");
+      router.back();
       setIsLoading(false);
 
       }catch (error) {

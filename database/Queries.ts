@@ -24,7 +24,7 @@ export const QUERIES_TRANSACTION = {
     `,
     SELECT_TRANSACTIONS: `
         SELECT 
-        t.id, t.value, t.created_at, t.category_id, t.type, t.title,
+        t.id, t.wallet_id as walletId, t.value, t.created_at, t.category_id as categoryId, t.type, t.title,
         c.title as categoryTitle,
         c.icon_name as iconName,
         c.icon_lib as iconLib
@@ -36,7 +36,7 @@ export const QUERIES_TRANSACTION = {
     `,
     SELECT_TRANSACTIONS_BY_CATEGORY: `
         SELECT 
-        t.id, t.value, t.created_at, t.category_id, t.type, t.title,
+        t.id, t.wallet_id as walletId, t.value, t.created_at, t.category_id as categoryId, t.type, t.title,
         c.title as categoryTitle,
         c.icon_name as iconName,
         c.icon_lib as iconLib
