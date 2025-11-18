@@ -6,13 +6,32 @@ export const QUERIES_CATEGORY = {
         VALUES (?, ?, ?, ?, ?, ?, ?);
     `,
     SELECT_CATEGORIES: `
-        SELECT * FROM categories WHERE wallet_id = ?;
+        SELECT 
+            c.id,
+            c.wallet_id,
+            c.title,
+            c.type,
+            c.created_at,
+            COALESCE(SUM(CASE 
+                WHEN strftime('%Y-%m', t.created_at) = strftime('%Y-%m', 'now') 
+                THEN t.value 
+                ELSE 0 
+            END), 0) as total,
+            c.icon_name,
+            c.icon_lib
+        FROM categories c
+        LEFT JOIN transactions t ON t.category_id = c.id
+        WHERE c.wallet_id = ?
+        GROUP BY c.id, c.wallet_id, c.title, c.type, c.created_at, c.icon_name, c.icon_lib;
     `,
     DELETE_CATEGORY: `
         DELETE FROM categories WHERE id = ?;
     `,
     UPDATE_CATEGORY_VALUE: `
         UPDATE categories SET total = total + ? WHERE id = ?;
+    `,
+    UPDATE_CATEGORY_TITLE: `
+        UPDATE categories SET title = ? WHERE id = ?;
     `
 }
 
@@ -45,6 +64,9 @@ export const QUERIES_TRANSACTION = {
         ON c.id = t.category_id
         WHERE t.wallet_id = ? AND t.category_id = ?;
 
+    `,
+    DELETE_TRANSACTION: `
+        DELETE FROM transactions WHERE id = ?;
     `
 }
 

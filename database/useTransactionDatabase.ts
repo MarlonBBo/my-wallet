@@ -47,5 +47,35 @@ export function transactionDatabase(db: SQLiteDatabase) {
         return await db.getAllAsync(QUERIES_TRANSACTION.SELECT_TRANSACTIONS_BY_CATEGORY, [wallet_id, category_id]);
     }
 
-    return { saveTransaction, TransactionsList, TransactionsByCategory };
+    async function deleteTransaction(id: number) {
+        // Buscar a transação para obter os dados necessários antes de deletar
+        const transaction = await db.getFirstAsync<{wallet_id: number, category_id: number, value: number, type: string}>(
+            "SELECT wallet_id, category_id, value, type FROM transactions WHERE id = ?",
+            [id]
+        );
+
+        if (!transaction) {
+            throw new Error("Transação não encontrada");
+        }
+
+        // Ajustar o saldo da carteira
+        if (transaction.type === "income") {
+            // Se era receita, subtrair do saldo
+            await db.runAsync(
+                "UPDATE wallets SET balance = balance - ? WHERE id = ?",
+                [transaction.value, transaction.wallet_id]
+            );
+        } else if (transaction.type === "expense") {
+            // Se era despesa, adicionar ao saldo (reverter)
+            await db.runAsync(
+                "UPDATE wallets SET balance = balance + ? WHERE id = ?",
+                [transaction.value, transaction.wallet_id]
+            );
+        }
+
+        // Deletar a transação
+        await db.runAsync(QUERIES_TRANSACTION.DELETE_TRANSACTION, [id]);
+    }
+
+    return { saveTransaction, TransactionsList, TransactionsByCategory, deleteTransaction };
 }

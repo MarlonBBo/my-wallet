@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
-    minHeight: 250,
+    minHeight: 280,
   },
   cardsRow: {
     flexDirection: "row",

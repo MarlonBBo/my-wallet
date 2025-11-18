@@ -2,6 +2,7 @@ import { categoryDatabase } from "@/database/useCategoryDatabase";
 import { Categories, CategoryDto, CategoryType } from "@/types/category";
 import { useSQLiteContext } from "expo-sqlite";
 import { create } from "zustand";
+import { useTransactionsStore } from "./useTransactionStore";
 
 type CategoryStore = {
   categories: Categories;
@@ -19,6 +20,17 @@ type CategoryStore = {
   filterCategories: (type: string) => void;
   filterCategoryById: (id: number) => CategoryType | undefined;
   cleanCategories: () => void;
+  deleteCategory: (
+    id: number,
+    wallet_id: number,
+    db: ReturnType<typeof useSQLiteContext>
+  ) => Promise<void>;
+  updateCategoryTitle: (
+    id: number,
+    title: string,
+    wallet_id: number,
+    db: ReturnType<typeof useSQLiteContext>
+  ) => Promise<void>;
 };
 
 export const useCategoryStore = create<CategoryStore>((set, get) => ({
@@ -71,5 +83,31 @@ export const useCategoryStore = create<CategoryStore>((set, get) => ({
 
   cleanCategories: () => {
     set({ categories: [], filteredCategories: [] });
-  }
+  },
+
+  deleteCategory: async (id: number, wallet_id: number, db) => {
+    const categoryDb = categoryDatabase(db);
+    try {
+      await categoryDb.deleteCategory(id);
+      await get().loadCategorys(wallet_id, db);
+      
+      // Recarregar transações para atualizar a lista
+      const { loadTransactions } = useTransactionsStore.getState();
+      await loadTransactions(wallet_id, db);
+    } catch (error) {
+      console.error("Erro ao deletar categoria:", error);
+      throw error;
+    }
+  },
+
+  updateCategoryTitle: async (id: number, title: string, wallet_id: number, db) => {
+    const categoryDb = categoryDatabase(db);
+    try {
+      await categoryDb.updateCategoryTitle(id, title);
+      await get().loadCategorys(wallet_id, db);
+    } catch (error) {
+      console.error("Erro ao atualizar categoria:", error);
+      throw error;
+    }
+  },
 }));

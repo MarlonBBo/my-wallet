@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, Text, Image, StatusBar, BackHandler } from "react-native";
+import { TouchableOpacity, View, Text, Image, StatusBar, BackHandler, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
@@ -16,14 +16,16 @@ import EmptyWallets from "./EmptyComponent";
 import { useCategoryStore } from "@/store/useCategoryStore";
 import { SkeletonCategoryRow } from "./SkeletonComponent";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTransactionsStore } from "@/store/useTransactionStore";
 
 export default function WalletsScreen() {
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
 
   const db = useSQLiteContext();
-  const { wallets, loadWallets, setActiveWallet, loading } = useWalletStore();
+  const { wallets, loadWallets, setActiveWallet, loading, deleteWallet, activeWallet } = useWalletStore();
   const { cleanCategories } = useCategoryStore();
+  const { loadTransactions } = useTransactionsStore();
 
   const handleAddWallet = async(item: WalletType) => {
     await AsyncStorage.setItem('@active_wallet', JSON.stringify(item));
@@ -31,7 +33,40 @@ export default function WalletsScreen() {
     cleanCategories();
     router.push("/drawer/(tabs)/home");
     StatusBar.setBarStyle(colorScheme === "dark" ? "dark-content" : "light-content");
-  } 
+  }
+
+  const handleDeleteWallet = (wallet: WalletType) => {
+    Alert.alert(
+      "Deletar Carteira",
+      `Tem certeza que deseja deletar a carteira "${wallet.name}"?\n\nEsta ação não pode ser desfeita e todos os dados relacionados serão excluídos permanentemente.`,
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Deletar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteWallet(wallet.id, db);
+              // Recarregar transações se necessário
+              if (activeWallet.id === wallet.id) {
+                const { wallets: updatedWallets } = useWalletStore.getState();
+                if (updatedWallets.length > 0) {
+                  await loadTransactions(updatedWallets[0].id, db);
+                }
+              }
+            } catch (error) {
+              Alert.alert("Erro", "Não foi possível deletar a carteira. Tente novamente.");
+              console.error("Erro ao deletar carteira:", error);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  }; 
 
   useFocusEffect(
     useCallback(() => {
@@ -77,12 +112,20 @@ export default function WalletsScreen() {
           contentContainerStyle={{ paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              key={item.id}
-              onPress={() => handleAddWallet(item)}
-            >
-              <WalletComponent amount={item.balance} title={item.name} />
-            </TouchableOpacity>
+            <View>
+              <TouchableOpacity
+                key={item.id}
+                onPress={() => handleAddWallet(item)}
+                activeOpacity={0.7}
+              >
+                <WalletComponent 
+                  amount={item.balance} 
+                  title={item.name}
+                  isActive={activeWallet.id === item.id}
+                  onDelete={() => handleDeleteWallet(item)}
+                />
+              </TouchableOpacity>
+            </View>
           )}
           ListEmptyComponent={loading ? <SkeletonCategoryRow /> : <EmptyWallets />}
         />

@@ -11,6 +11,7 @@ type TransactionsStore = {
 
   loadTransactions: (wallet_id: number,db: ReturnType<typeof useSQLiteContext>) => Promise<void>;
   addTransaction: (transaction: TransactionDto, db: ReturnType<typeof useSQLiteContext>) => Promise<void>;
+  deleteTransaction: (id: number, wallet_id: number, db: ReturnType<typeof useSQLiteContext>) => Promise<void>;
   filterType: (type: 'income' | 'expense') => number;
   filterByDate: (date: string, type: 'income' | 'expense') => number ;
   TransactionsByCategory: (wallet_id: number, category_id: number, db: ReturnType<typeof useSQLiteContext>) => Promise<Transactions | null>;
@@ -51,6 +52,37 @@ export const useTransactionsStore = create<TransactionsStore>((set, get) => ({
       
     } catch (error) {
       console.error("Erro ao salvar transação:", error);
+    }
+  },
+
+  deleteTransaction: async (id, wallet_id, db) => {
+    const transactionDb = transactionDatabase(db);
+    try {
+      // Buscar a transação antes de deletar para obter os dados necessários
+      const transaction = await db.getFirstAsync<{category_id: number, value: number, type: string}>(
+        "SELECT category_id, value, type FROM transactions WHERE id = ?",
+        [id]
+      );
+
+      if (!transaction) {
+        throw new Error("Transação não encontrada");
+      }
+
+      await transactionDb.deleteTransaction(id);
+      
+      // Recarregar transações
+      await get().loadTransactions(wallet_id, db);
+
+      // Recarregar carteira
+      const { loadWallets } = useWalletStore.getState();
+      await loadWallets(db);
+
+      // Recarregar categorias
+      const { loadCategorys } = useCategoryStore.getState();
+      await loadCategorys(wallet_id, db);
+    } catch (error) {
+      console.error("Erro ao deletar transação:", error);
+      throw error;
     }
   },
 

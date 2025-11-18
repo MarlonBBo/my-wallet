@@ -25,8 +25,16 @@ export function AnotationItemComponent({
   const theme = THEME[colorScheme ?? "light"];
   const { valuesVisible } = useVisibilityStore();
 
+  const handleToggle = () => {
+    if (onToggle) {
+      onToggle(item.id, !item.completed);
+    }
+  };
+
   return (
-    <View
+    <TouchableOpacity
+      onPress={handleToggle}
+      activeOpacity={0.7}
       className={`border border-border rounded-2xl p-3 flex-row items-center bg-background shadow-sm mb-3 ${
         item.completed ? "opacity-60" : ""
       }`}
@@ -77,11 +85,11 @@ export function AnotationItemComponent({
         <View className="ml-3">
           <Checkbox
             checked={item.completed}
-            onCheckedChange={(checked) => onToggle(item.id, checked)}
+            disabled={true}
           />
         </View>
       )}
-    </View>
+    </TouchableOpacity>
   );
 }
 

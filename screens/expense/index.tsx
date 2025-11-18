@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { THEME } from "@/lib/theme";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useWalletStore } from "@/store/useWalletStore";
 import { useTransactionsStore } from "@/store/useTransactionStore";
 import { useCategoryStore } from "@/store/useCategoryStore";
@@ -34,6 +34,14 @@ export default function ExpenseScreen() {
   const [categoriaSelecionada, setCategoriaSelecionada] = useState<string| number | null>(null);
   const [title, setTitle] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  
+  const valorFormatado = useMemo(() => {
+    return valorCentavos === 0 ? '' : formatarValorBr(valorCentavos);
+  }, [valorCentavos]);
+
+  const handleValueChange = useCallback((text: string) => {
+    handleChange(text, setValorCentavos);
+  }, []);
 
   const { activeWallet } = useWalletStore();
   const { filterCategoryById } = useCategoryStore();
@@ -124,7 +132,7 @@ export default function ExpenseScreen() {
           className="text-xl font-bold text-center"
           style={{ color: theme.foreground }}
         >
-          Qual é o valor da transferência?
+          Qual é o valor da transação?
         </Text>
       </View>
 
@@ -136,8 +144,11 @@ export default function ExpenseScreen() {
         placeholder="R$ 0,00"
         placeholderTextColor={theme.ring}
         keyboardType="numeric"
-        value={valorCentavos === 0 ? '' : formatarValorBr(valorCentavos)}
-        onChangeText={(text) => handleChange(text, setValorCentavos)}
+        value={valorFormatado}
+        onChangeText={handleValueChange}
+        autoFocus={false}
+        blurOnSubmit={false}
+        returnKeyType="done"
       />
 
       <View className="mt-10 w-full gap-6 items-center">

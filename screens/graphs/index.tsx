@@ -84,14 +84,9 @@ export function GraphsScreen() {
 
     const barData = catsWithValue.map((cat, index) => ({
       value: cat.total / 100, // Converter centavos para reais
-      label: cat.title.length > 8 ? cat.title.substring(0, 8) + '...' : cat.title,
+      label: cat.title,
       frontColor: colors[index % colors.length],
       gradientColor: colors[index % colors.length],
-      topLabelComponent: () => (
-        <Text style={{ color: theme.foreground, fontSize: 10, fontWeight: '600' }}>
-          {valuesVisible ? formatarValorBr(cat.total) : 'R$ •••'}
-        </Text>
-      ),
       category: cat,
       total: cat.total,
     }));
@@ -188,7 +183,7 @@ export function GraphsScreen() {
 
   return (
     <View className='flex-1 bg-background'>
-      <SafeAreaView>
+      <View className="mt-7 w-full">
         <Header 
           bg={theme.background} 
           iconColor={theme.foreground}
@@ -202,14 +197,14 @@ export function GraphsScreen() {
             </TouchableOpacity>
           }
         />
-      </SafeAreaView>
+      </View>
       
       <ScrollView 
         className='flex-1 px-4'
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 140 }}
       >
-        <View className='mb-4'>
+        <View className='mb-4 mt-4'>
           <Text className='font-bold text-2xl text-foreground mb-2'>Gráficos</Text>
           <Text className='text-sm text-muted-foreground mb-4'>
             Visualize a distribuição por categorias
@@ -311,16 +306,19 @@ export function GraphsScreen() {
                     <View className="w-full">
                       <BarChart
                         data={currentChartData.bar}
-                        width={300}
-                        height={220}
+                        width={Math.max(300, currentChartData.bar.length * 50)}
+                        height={280}
                         barWidth={30}
-                        spacing={20}
+                        spacing={Math.max(20, 40 - currentChartData.bar.length * 2)}
                         roundedTop
                         roundedBottom
                         hideRules
-                        xAxisThickness={0}
+                        xAxisThickness={1}
+                        xAxisColor={theme.border}
                         yAxisThickness={0}
                         yAxisTextStyle={{ color: theme.mutedForeground, fontSize: 10 }}
+                        xAxisLabelTextStyle={{ color: theme.mutedForeground, fontSize: 9, textAlign: 'center', width: 60 }}
+                        showXAxisIndices
                         noOfSections={4}
                         maxValue={maxBarValue}
                         isAnimated
@@ -328,6 +326,7 @@ export function GraphsScreen() {
                         showGradient
                         frontColor={theme.primary}
                         gradientColor={theme.chart2}
+                        showVerticalLines={false}
                       />
                     </View>
                   )}
@@ -354,7 +353,7 @@ export function GraphsScreen() {
                         isAnimated
                         animationDuration={800}
                         spacing={40}
-                        initialSpacing={10}
+                        initialSpacing={30}
                       />
                     </View>
                   )}
@@ -413,16 +412,18 @@ export function GraphsScreen() {
                     <View className="w-full">
                       <BarChart
                         data={currentChartData.bar}
-                        width={300}
-                        height={220}
+                        width={Math.max(300, currentChartData.bar.length * 50)}
+                        height={280}
                         barWidth={30}
-                        spacing={20}
+                        spacing={Math.max(20, 40 - currentChartData.bar.length * 2)}
                         roundedTop
                         roundedBottom
                         hideRules
-                        xAxisThickness={0}
+                        xAxisThickness={1}
+                        xAxisColor={theme.border}
                         yAxisThickness={0}
                         yAxisTextStyle={{ color: theme.mutedForeground, fontSize: 10 }}
+                        xAxisLabelTextStyle={{ color: theme.mutedForeground, fontSize: 9, textAlign: 'center', width: 60 }}
                         noOfSections={4}
                         maxValue={maxBarValue}
                         isAnimated
@@ -430,6 +431,7 @@ export function GraphsScreen() {
                         showGradient
                         frontColor={theme.destructive}
                         gradientColor={theme.chart1}
+                        showVerticalLines={false}
                       />
                     </View>
                   )}
@@ -456,7 +458,7 @@ export function GraphsScreen() {
                         isAnimated
                         animationDuration={800}
                         spacing={40}
-                        initialSpacing={10}
+                        initialSpacing={30}
                       />
                     </View>
                   )}

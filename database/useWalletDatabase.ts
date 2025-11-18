@@ -12,5 +12,9 @@ export function walletDatabase(db: SQLiteDatabase) {
     return await db.getAllAsync(QUERIES_WALLET.SELECT_WALLETS);
   }
 
-  return { salvarCarteira, listarCarteiras };
+  async function deletarCarteira(walletId: number) {
+    await db.runAsync(QUERIES_WALLET.DELETE_WALLET, [walletId]);
+  }
+
+  return { salvarCarteira, listarCarteiras, deletarCarteira };
 } 

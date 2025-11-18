@@ -2,10 +2,10 @@ import Header from '@/components/Header';
 import { Card } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import { THEME } from '@/lib/theme';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, router } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { useCallback, useEffect, useState, useMemo } from 'react';
-import { StatusBar, TouchableOpacity, View } from 'react-native';
+import { StatusBar, TouchableOpacity, View, Alert } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TransactionComponent } from './TransactionComponent';
 import { Feather } from '@expo/vector-icons';
@@ -31,10 +31,38 @@ export function TransactionScreen() {
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
 
-  const { loadTransactions, transactions } = useTransactionsStore();
+  const { loadTransactions, transactions, deleteTransaction } = useTransactionsStore();
   const { activeWallet } = useWalletStore();
   const { valuesVisible, toggleValuesVisibility } = useVisibilityStore();
   const db = useSQLiteContext();
+
+  const handleDeleteTransaction = (transaction: any) => {
+    if (!transaction || !activeWallet.id) return;
+
+    Alert.alert(
+      "Deletar Transação",
+      `Tem certeza que deseja deletar a transação "${transaction.title}"?\n\nEsta ação não pode ser desfeita e o saldo da carteira será atualizado.`,
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Deletar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteTransaction(transaction.id, activeWallet.id, db);
+            } catch (error) {
+              Alert.alert("Erro", "Não foi possível deletar a transação. Tente novamente.");
+              console.error("Erro ao deletar transação:", error);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   useFocusEffect(
       useCallback(() => {
@@ -161,7 +189,7 @@ export function TransactionScreen() {
  
   return (
     <View className='flex-1 bg-background'>
-      <SafeAreaView>
+      <View className='mt-7 w-full'>
         <Header 
           bg={theme.background} 
           iconColor={theme.foreground}
@@ -175,9 +203,9 @@ export function TransactionScreen() {
             </TouchableOpacity>
           }
         />
-      </SafeAreaView>
+      </View>
       
-        <View className='px-2 gap-2'>
+        <View className='px-2 gap-2 mt-12'>
                <View className='flex-row justify-between items-center pr-1'>
                     <Text className='font-bold text-2xl '>Transações</Text>
                     <DropdownMenu onOpenChange={setDropdownOpen}>
@@ -357,7 +385,7 @@ export function TransactionScreen() {
                     value={item.value}
                     iconName={item.iconName}
                     iconLib={item.iconLib}
-                    onPress={() => console.log()}
+                    onPress={() => handleDeleteTransaction(item)}
                     type={item.type}
                   />
                 )}

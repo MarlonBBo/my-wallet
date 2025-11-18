@@ -21,6 +21,9 @@
 import { SQLiteDatabase } from "expo-sqlite";
 
 export async function initializeDatabase(database: SQLiteDatabase) {
+  // Habilitar foreign keys
+  await database.execAsync(`PRAGMA foreign_keys = ON;`);
+  
   await database.execAsync(`
     CREATE TABLE IF NOT EXISTS wallets (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

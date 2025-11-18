@@ -5,7 +5,7 @@ import { THEME } from '@/lib/theme';
 import { useFocusEffect } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { useCallback, useEffect, useState, useMemo } from 'react';
-import { StatusBar, TouchableOpacity, View } from 'react-native';
+import { StatusBar, TouchableOpacity, View, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useAnotationStore } from '@/store/useAnotationStore';
@@ -24,7 +24,7 @@ export default function AnotationScreen() {
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
 
-  const { loadAnotations, anotations, loading } = useAnotationStore();
+  const { loadAnotations, anotations, loading, deleteAnotation } = useAnotationStore();
   const { activeWallet } = useWalletStore();
   const { valuesVisible, toggleValuesVisibility } = useVisibilityStore();
   const db = useSQLiteContext();
@@ -57,9 +57,41 @@ export default function AnotationScreen() {
     });
   };
 
+  const handleDeleteAnotation = (anotationId: number) => {
+    const anotation = anotations.find((a) => a.id === anotationId);
+    
+    if (!anotation) return;
+
+    Alert.alert(
+      "Deletar Anotação",
+      `Tem certeza que deseja deletar a anotação "${anotation.title}"?\n\nEsta ação não pode ser desfeita e todos os itens relacionados serão excluídos permanentemente.`,
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Deletar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              if (activeWallet.id) {
+                await deleteAnotation(anotationId, activeWallet.id, db);
+              }
+            } catch (error) {
+              Alert.alert("Erro", "Não foi possível deletar a anotação. Tente novamente.");
+              console.error("Erro ao deletar anotação:", error);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   return (
     <View className='flex-1 bg-background'>
-      <SafeAreaView>
+      <View className='mt-7 w-full'>
         <Header 
           bg={theme.background} 
           iconColor={theme.foreground}
@@ -82,9 +114,9 @@ export default function AnotationScreen() {
             </TouchableOpacity>
           }
         />
-      </SafeAreaView>
+      </View>
       
-      <View className='px-2'>
+      <View className='px-2 mt-12'>
         <Tabs 
           value={value} 
           onValueChange={(val) => setValue(val as 'income' | 'expense')} 
@@ -114,6 +146,8 @@ export default function AnotationScreen() {
                   <AnotationComponent
                     anotation={item}
                     onPress={() => handleAnotationPress(item.id)}
+                    onDelete={handleDeleteAnotation}
+                    showDelete={true}
                   />
                 )}
                 ListEmptyComponent={<EmptyAnotation />}
@@ -135,6 +169,8 @@ export default function AnotationScreen() {
                   <AnotationComponent
                     anotation={item}
                     onPress={() => handleAnotationPress(item.id)}
+                    onDelete={handleDeleteAnotation}
+                    showDelete={true}
                   />
                 )}
                 ListEmptyComponent={<EmptyAnotation />}

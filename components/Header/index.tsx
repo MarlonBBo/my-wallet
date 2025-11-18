@@ -9,6 +9,7 @@ type IconsType = {
     iconOne?: ReactNode;
     iconTwo?: ReactNode;
     iconTree?: ReactNode;
+    iconFour?: ReactNode;
     bg: string;
     iconColor: string;
     viewDrawer?: boolean;
@@ -18,6 +19,7 @@ export default function Header({
     iconOne, 
     iconTwo, 
     iconTree, 
+    iconFour,
     bg, 
     iconColor,
     viewDrawer = true
@@ -44,6 +46,7 @@ export default function Header({
                 {iconOne}
                 {iconTwo}
                 {iconTree}
+                {iconFour}
             </View>
         </View>
     )

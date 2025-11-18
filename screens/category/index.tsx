@@ -59,7 +59,7 @@ export function CategoryScreen() {
  
   return (
     <View className='flex-1 bg-background'>
-      <SafeAreaView>
+      <View className='mt-7 w-full'>
         <Header 
           bg={theme.background} 
           iconColor={theme.foreground}
@@ -78,9 +78,9 @@ export function CategoryScreen() {
             </TouchableOpacity>
           }
         />
-      </SafeAreaView>
+      </View>
       
-      <View className='px-2'>
+      <View className='px-2 mt-12'>
         <Tabs value={value} onValueChange={setValue} className="w-[400px]">
         <Text className='absolute font-bold text-2xl '>Categorias</Text>
         <TabsList>
@@ -109,6 +109,10 @@ export function CategoryScreen() {
                   value={item.total}
                   icon={item.icon_name}
                   lib={item.icon_lib}
+                  onPress={() => router.push({
+                    pathname: "/detail-category",
+                    params: { id: item.id.toString() }
+                  })}
                 />
             )}
             ListEmptyComponent={<EmptyCategory />}
@@ -133,6 +137,10 @@ export function CategoryScreen() {
                   value={item.total}
                   icon={item.icon_name}
                   lib={item.icon_lib}
+                  onPress={() => router.push({
+                    pathname: "/detail-category",
+                    params: { id: item.id.toString() }
+                  })}
                 />
             )}
             ListEmptyComponent={loading ? <SkeletonCategoryRow /> : <EmptyCategory />}

@@ -15,7 +15,10 @@ import { useWalletStore } from "@/store/useWalletStore";
 import { formatarValorBr } from "@/utils/FormatCurrent";
 import { useTransactionsStore } from "@/store/useTransactionStore";
 import { useVisibilityStore } from "@/store/useVisibilityStore";
+import { useCategoryStore } from "@/store/useCategoryStore";
 import { OnboardingModal } from "@/components/OnboardingModal";
+import { useSQLiteContext } from "expo-sqlite";
+import { UpdatesModal } from "@/components/UpdatesModal";
 
 
 export default function HomeScreen() {
@@ -24,10 +27,13 @@ export default function HomeScreen() {
 
   const [scrollEnabled, setScrollEnabled] = useState(true);
   const [visible, setVisible] = useState(false);
+  const [updatesVisible, setUpdatesVisible] = useState(false);
 
-  const { activeWallet } = useWalletStore();
-  const { transactions } = useTransactionsStore();
+  const { activeWallet, loadWallets } = useWalletStore();
+  const { transactions, loadTransactions } = useTransactionsStore();
+  const { loadCategorys } = useCategoryStore();
   const { valuesVisible, toggleValuesVisibility } = useVisibilityStore();
+  const db = useSQLiteContext();
  
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? 'light']
@@ -35,7 +41,20 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBarStyle(colorScheme === "dark" ? "dark-content" : "light-content");
-    }, [colorScheme])
+      
+      // Se a carteira ativa for Default Wallet, redirecionar para wallets
+      if (activeWallet.id === 0 || activeWallet.name === "Default Wallet") {
+        router.replace("/drawer/wallets");
+        return;
+      }
+      
+      // Carregar transações, categorias e carteira quando a tela receber foco
+      if (activeWallet.id && db) {
+        loadTransactions(activeWallet.id, db);
+        loadCategorys(activeWallet.id, db);
+        loadWallets(db);
+      }
+    }, [colorScheme, activeWallet.id, activeWallet.name, db, loadTransactions, loadCategorys, loadWallets, router])
   );
 
   useEffect(() => {
@@ -66,7 +85,7 @@ export default function HomeScreen() {
               bg={theme.foreground} 
               iconColor={theme.background}
               iconOne={
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => setUpdatesVisible(true)}>
                   <Feather name='bell' size={20} color={theme.background}/>
                 </TouchableOpacity>
               } 
@@ -117,6 +136,7 @@ export default function HomeScreen() {
       <View className="h-36"/>
 
       <CustomModal visible={visible} setVisible={setVisible}/>
+      <UpdatesModal visible={updatesVisible} setVisible={setUpdatesVisible}/>
       
       <OnboardingModal
         screenKey="home"

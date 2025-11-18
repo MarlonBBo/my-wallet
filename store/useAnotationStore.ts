@@ -15,6 +15,7 @@ type AnotationStore = {
   addItem: (item: AnotationItemDto, db: ReturnType<typeof useSQLiteContext>) => Promise<void>;
   toggleItemCompleted: (id: number, completed: boolean, db: ReturnType<typeof useSQLiteContext>) => Promise<void>;
   deleteItem: (id: number, anotation_id: number, db: ReturnType<typeof useSQLiteContext>) => Promise<void>;
+  deleteAnotation: (id: number, wallet_id: number, db: ReturnType<typeof useSQLiteContext>) => Promise<void>;
   filterAnotation: (id: number) => Promise<AnotationType>;
 }; 
 
@@ -97,6 +98,16 @@ deleteItem: async (id, anotation_id, db) => {
 
   } catch (error) {
     console.error("Erro ao deletar item:", error);
+  }
+},
+
+deleteAnotation: async (id, wallet_id, db) => {
+  const anotationDb = anotationDatabase(db);
+  try {
+    await anotationDb.deleteAnotation(id);
+    await get().loadAnotations(wallet_id, db);
+  } catch (error) {
+    console.error("Erro ao deletar anotação:", error);
   }
 },
 

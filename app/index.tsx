@@ -50,9 +50,10 @@ export default function InitialScreen() {
     );
   }
 
-  if (activeWallet?.id) {
+  // Se a carteira ativa for Default Wallet (id: 0) ou não tiver id, redirecionar para wallets
+  if (activeWallet?.id && activeWallet.id !== 0 && activeWallet.name !== "Default Wallet") {
     return <Redirect href="/drawer/(tabs)/home" />;
-  }else{
+  } else {
     return <Redirect href={"/drawer/wallets" as any} />;
   }
 }

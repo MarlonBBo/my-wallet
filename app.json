@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "my-wallet",
+    "name": "My Wallet Local",
     "slug": "my-wallet",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -17,12 +17,16 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.marlon.mywallet",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.m4rlon_b4rreto.mywallet"

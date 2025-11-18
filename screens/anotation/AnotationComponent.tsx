@@ -8,11 +8,15 @@ import { AnotationType } from "@/types/anotation";
 type AnotationComponentProps = {
   anotation: AnotationType;
   onPress?: () => void;
+  onDelete?: (id: number) => void;
+  showDelete?: boolean;
 };
 
 export function AnotationComponent({
   anotation,
   onPress,
+  onDelete,
+  showDelete = false,
 }: AnotationComponentProps) {
   const { colorScheme } = useColorScheme();
   const theme = THEME[colorScheme ?? "light"];
@@ -46,6 +50,16 @@ export function AnotationComponent({
           {formatToBR(anotation.created_at)}
         </Text>
       </View>
+
+      {showDelete && onDelete && (
+        <TouchableOpacity
+          onPress={() => onDelete(anotation.id)}
+          className="mr-2 p-2"
+          hitSlop={10}
+        >
+          <Feather name="trash-2" size={18} color={theme.destructive} />
+        </TouchableOpacity>
+      )}
 
       <View>
         <Feather name="chevron-right" size={20} color={theme.mutedForeground} />

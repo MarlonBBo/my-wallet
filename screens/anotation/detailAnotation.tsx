@@ -26,7 +26,7 @@ export default function DetailAnotationScreen() {
 
   const { loadItens, itens, loading, filterAnotation, toggleItemCompleted, deleteItem } =
     useAnotationStore();
-  const { valuesVisible } = useVisibilityStore();
+  const { valuesVisible, toggleValuesVisibility } = useVisibilityStore();
   const db = useSQLiteContext();
 
   const [anotation, setAnotation] = useState<any>(null);
@@ -102,12 +102,12 @@ export default function DetailAnotationScreen() {
               <Feather name="plus" size={20} color={theme.foreground} />
             </TouchableOpacity>
           }
-          iconTree={
+          iconFour={
             <TouchableOpacity onPress={() => router.back()}>
               <Feather name="log-out" size={20} color={theme.foreground} />
             </TouchableOpacity>
           }
-          iconTwo={
+          iconTree={
             <TouchableOpacity 
               onPress={() => setIsDeleteMode(!isDeleteMode)}
             >
@@ -117,6 +117,15 @@ export default function DetailAnotationScreen() {
                 color={isDeleteMode ? theme.destructive : theme.foreground} 
               />
             </TouchableOpacity>
+          }
+          iconTwo={
+            <TouchableOpacity onPress={toggleValuesVisibility}>
+                  <Feather 
+                    name={valuesVisible ? 'eye' : 'eye-off'} 
+                    size={20} 
+                    color={theme.foreground}
+                  />
+                </TouchableOpacity>
           }
         />
       </View>

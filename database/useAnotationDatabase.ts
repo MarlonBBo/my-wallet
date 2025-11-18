@@ -43,12 +43,17 @@ export function anotationDatabase(db: SQLiteDatabase) {
       );
     }
 
+    async function deleteAnotation(id: number) {
+      await db.runAsync(QUERIES_ANOTATION.DELETE_ANOTATION, [id]);
+    }
+
     return { 
         saveAnotation, 
         anotationsList, 
         saveItem, 
         itemList, 
         checkItem,
-        deleteItem
+        deleteItem,
+        deleteAnotation
     };
 }
