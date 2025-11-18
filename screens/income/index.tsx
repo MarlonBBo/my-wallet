@@ -1,17 +1,17 @@
 import { SelectComponent } from "@/components/Select";
 import { useColorScheme } from "nativewind";
 import {
+  Alert,
   StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { THEME } from "@/lib/theme";
 import { router } from "expo-router";
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useWalletStore } from "@/store/useWalletStore";
 import { useTransactionsStore } from "@/store/useTransactionStore";
 import { useCategoryStore } from "@/store/useCategoryStore";
@@ -50,19 +50,32 @@ export default function IncomeScreen() {
   const theme = THEME[colorScheme ?? "light"];
 
   const handleAddTransaction = async () => {
-
     setIsLoading(true);
 
-    if (valorCentavos > 0 && categoriaSelecionada) {
+    // Validação do valor
+    if (valorCentavos <= 0) {
+      setIsLoading(false);
+      Alert.alert("Erro", "Por favor, informe o valor da transação.");
+      return;
+    }
 
-      if (valorCentavos <= 0 || !categoriaSelecionada) return;
+    // Validação da categoria
+    if (!categoriaSelecionada) {
+      setIsLoading(false);
+      Alert.alert("Erro", "Por favor, selecione uma categoria.");
+      return;
+    }
 
-      const CatSelected = filterCategoryById(Number(categoriaSelecionada));
-      if(!CatSelected) return;
+    // Validação da categoria no store
+    const CatSelected = filterCategoryById(Number(categoriaSelecionada));
+    if (!CatSelected) {
+      setIsLoading(false);
+      Alert.alert("Erro", "Categoria selecionada não encontrada. Por favor, selecione outra categoria.");
+      return;
+    }
 
-      try {
-
-        const transaction: TransactionDto = {
+    try {
+      const transaction: TransactionDto = {
         walletId: activeWallet.id,
         categoryId: Number(categoriaSelecionada),
         value: valorCentavos,
@@ -74,13 +87,11 @@ export default function IncomeScreen() {
       };
       await addTransaction(transaction, db);
       router.back();
+    } catch (error) {
+      console.log("Erro ao adicionar transação: ", error);
+      Alert.alert("Erro", "Não foi possível salvar a transação. Tente novamente.");
+    } finally {
       setIsLoading(false);
-
-      }catch (error) {
-        console.log("Erro ao adicionar transação: ", error);
-      } finally {
-        setIsLoading(false);
-      }
     }
   };
 

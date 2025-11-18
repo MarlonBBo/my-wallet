@@ -17,6 +17,7 @@ import { useCategoryStore } from "@/store/useCategoryStore";
 import { SkeletonCategoryRow } from "./SkeletonComponent";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTransactionsStore } from "@/store/useTransactionStore";
+import { OnboardingModal } from "@/components/OnboardingModal";
 
 export default function WalletsScreen() {
   const { colorScheme } = useColorScheme();
@@ -140,6 +141,20 @@ export default function WalletsScreen() {
             Adicionar Nova Carteira
           </Text>
         </TouchableOpacity>
+
+      <OnboardingModal
+        screenKey="wallets"
+        title="Carteiras"
+        description="Organize suas finanças criando múltiplas carteiras para diferentes propósitos."
+        icon="credit-card"
+        features={[
+          "Crie carteiras separadas para diferentes objetivos (pessoal, trabalho, viagem, etc.)",
+          "Cada carteira tem seu próprio saldo e histórico de transações",
+          "Toque em uma carteira para torná-la ativa e começar a usar",
+          "Visualize o saldo total de todas as suas carteiras no topo",
+          "Use o botão + para criar novas carteiras quando precisar"
+        ]}
+      />
     </SafeAreaView>
   );
 }
